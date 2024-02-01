@@ -1,9 +1,8 @@
-
+import Homepage from './Homepage.js'
 
 function App() {
   return (
-    <section>
-    </section>
+    <Homepage />
   );
 }
 
