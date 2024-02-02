@@ -1,32 +1,54 @@
-import React from 'react'
+import React from 'react';
+import styles from "./GameRoom.module.css";
 
 export default function GameRoom(props){
 
-    return(
-        <>
-            <div class="game-container">
-                <div class="guesses-container">
-                    <div class="your-guesses">
-                        <h2>your guesses</h2>
-                        <p>HELLO 2</p>
-                        <p>TEETH 0</p>
-                        <p>HOUSE 0</p>
-                    </div>
-                    <div class="enemy-guesses">
-                        <h2>enemy guesses</h2>
-                        <p>HELLO 0</p>
-                        <p>ALLAH 0</p>
-                        <p>INUET 1</p>
-                    </div>
-                </div>
-                <div class="input-area">
-                    <label for="current-guess">input current guess:</label>
-                    <input type="text" id="current-guess" name="current-guess" maxlength="5"></input>
-                </div>
-                <div class="notes-area">
-                    <textarea placeholder="*text area for notes about the game*"></textarea>
-                </div>
+    return (
+      <>
+        <div className={styles.gameContainer}>
+          <div className={styles.guessesContainer}>
+            <div className={styles.yourGuesses}>
+              <h2>Your guesses</h2>
+              <ul>
+                <li>
+                  <p>HELLO 2</p>
+                </li>
+                <li>
+                  <p>TEETH 0</p>
+                </li>
+                <li>
+                  <p>HOUSE 0</p>
+                </li>
+              </ul>
             </div>
-        </>
-    )
+            <div className={styles.enemyGuesses}>
+              <h2>Enemy guesses</h2>
+              <ul>
+                <li>
+                  <p>HELLO 0</p>
+                </li>
+                <li>
+                  <p>ALLAH 0</p>
+                </li>
+                <li>
+                  <p>INUET 1</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className={styles.inputArea}>
+            <label htmlFor="current-guess">input current guess:</label>
+            <input
+              type="text"
+              id="current-guess"
+              name="current-guess"
+              maxLength="5"
+            />
+          </div>
+          <div className={styles.notesArea}>
+            <textarea placeholder="*text area for notes about the game*"></textarea>
+          </div>
+        </div>
+      </>
+    );
 }
