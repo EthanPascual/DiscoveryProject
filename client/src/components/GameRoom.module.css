@@ -1,0 +1,40 @@
+.gameContainer {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.enemyGuesses ul, .yourGuesses ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.guessesContainer {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.inputArea {
+    margin-bottom: 20px;
+}
+
+.inputArea label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.inputArea input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+}
+
+.notesArea textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+}
