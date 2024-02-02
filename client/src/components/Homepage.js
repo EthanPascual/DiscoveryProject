@@ -2,6 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Homepage(props){
+
+    const [playerName, setPlayerName] = useState('');
+    
     let navigate = useNavigate();
 
     const goToGameRoom = () => {
