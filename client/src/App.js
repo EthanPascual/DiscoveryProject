@@ -33,6 +33,9 @@ function App() {
         try {
             let randomName = await getRandomName();
             console.log(randomName);
+
+            //REMEMBER TO ADD THIS NAME TO OUR DATABASE, AS WELL AS MAKING SURE IT ISNT ALREADY USED
+
             setCookie("user", randomName, { path: "/" });
         } catch (error) {
             console.error('Error setting cookie:', error);

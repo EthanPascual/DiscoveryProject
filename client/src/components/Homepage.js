@@ -21,6 +21,8 @@ export default function Homepage({user}){
         <>
             <div className="home-container">
                 <h1>Welcome to the Wordle Game, {user}</h1>
+            </div>
+            <div className="home-buttons">
                 <button onClick={goToGameRoom}>Start Game</button>
                 <button onClick={goToStats}>Stats</button>
             </div>
