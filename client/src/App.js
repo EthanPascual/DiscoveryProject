@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GameRoom from "./components/GameRoom";
 import Stats from "./components/Stats"
 import { CookiesProvider, useCookies} from 'react-cookie';
+import axios from "axios";
 
 
 
@@ -46,7 +47,15 @@ function App() {
 
             //REMEMBER TO ADD THIS NAME TO OUR DATABASE, AS WELL AS MAKING SURE IT ISNT ALREADY USED
 
+
+
             setCookie("user", randomName, { path: "/" });
+
+            await axios.post('http://localhost:8000/newUsers',{
+              UserName: randomName
+            });
+
+
         } catch (error) {
             console.error('Error setting cookie:', error);
         }
@@ -56,7 +65,7 @@ function App() {
 const [cookies, setCookie] = useCookies(["user"]);
 setCookieIfNewUser();
 let user = cookies.user;
-
+console.log(user);
   return (
     <Router>
       <Routes>
