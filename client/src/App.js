@@ -9,22 +9,32 @@ import { CookiesProvider, useCookies} from 'react-cookie';
 
 
 function App() {
+
+  const [wordList, setWordsList] = useState([]);
+
   const getRandomName = async () => {
     try {
-      const response = await fetch('/words.json');
-      if (!response.ok) {
-          throw new Error('Failed to fetch data');
+      if(wordList.length === 0){
+        const response = await fetch('/words.json');
+        
+        if (!response.ok) {
+            throw new Error('Failed to fetch data');
+        }
+
+        const jsonData = await response.json();
+        const wordsList = jsonData.list;
+        console.log(wordsList);
+        setWordsList(wordList);
+        
       }
-      const jsonData = await response.json();
-      const wordsList = jsonData.list;
-      console.log(wordsList);
+
+      
       
       let length = wordsList.length;
       let randomName = wordsList[Math.floor(Math.random() * length)] + wordsList[Math.floor(Math.random() * length)];
       return randomName;
     } catch (error) {
       console.error('Error:', error);
-      // You might want to handle the error here or rethrow it depending on your needs
       throw error;
     }
   }
