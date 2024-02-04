@@ -1,5 +1,5 @@
 import Homepage from "./components/Homepage";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './stylesheets/index.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GameRoom from "./components/GameRoom";
@@ -17,6 +17,7 @@ function App() {
     try {
       if(wordList.length === 0){
         const response = await fetch('/words.json');
+
         
         if (!response.ok) {
             throw new Error('Failed to fetch data');
@@ -25,14 +26,14 @@ function App() {
         const jsonData = await response.json();
         const wordsList = jsonData.list;
         console.log(wordsList);
-        setWordsList(wordList);
-        
-      }
+        setWordsList(wordsList);
+      }  
+      
 
       
       
-      let length = wordsList.length;
-      let randomName = wordsList[Math.floor(Math.random() * length)] + wordsList[Math.floor(Math.random() * length)];
+      let length = wordList.length;
+      let randomName = wordList[Math.floor(Math.random() * length)] + wordList[Math.floor(Math.random() * length)];
       return randomName;
     } catch (error) {
       console.error('Error:', error);
