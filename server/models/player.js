@@ -22,7 +22,7 @@ const playerSchema = new Schema({
 
 
 playerSchema.virtual('url').get(()=>{
-   return `posts/answer/${this._id}`
+   return `player/${this._id}`
 })
 
 
