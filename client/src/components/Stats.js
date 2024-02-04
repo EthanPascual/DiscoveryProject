@@ -8,10 +8,11 @@ export default function Stats(props){
     useEffect(() => {
         axios.get('http://localhost:8000/users').then(res => {
       
-      setUserList(res.data);
+            setUserList(res.data);
 
-    });
+        });
     }, []);
+
 
     console.log(userList);
 
