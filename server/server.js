@@ -28,14 +28,23 @@ const io = new Server(server,{
 server.listen(port, () => {
 
     console.log('server running at port: '+ port)
-    
+
 })
 
 io.on('connection', (socket) => {
+    console.log('🔥: user ' + socket.id + ' connected');
+    socket.join("room1");
+    socket.on('disconnect', () => {
+      console.log('🔥: user ' + socket.id + ' disconnected');
+    });
 
-    console.log("user connected, socket id: "+ socket.id)
+    socket.on('message', (message) => {
+        console.log('📩: message received: ' + message);
+        socket.to('room1').emit('message', message);
+    });
 
   });
+
 
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
