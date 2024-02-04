@@ -16,32 +16,12 @@ app.listen(port, () => {
     console.log('Discovery listening on port ' + port)
 })
 
-const genName = () => {
-
-    //Create algo for generating a name for user without cookie
-
-}
-
 
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.on('connected', function () {
     console.log("connected to database")
     app.use(cors())
-    app.get('/cookie', (req, res) => {
-        let playerName = req.cookies.playerName;
-    
-        if (!playerName) {
-            playerName = genName();
-            res.cookie(
-                'playerName',
-                playerName, 
-                { maxAge: 365 * 24 * 60 * 60 * 1000 });
-        }
-    
-    res.json({ playerName });
-
-    });
 
 app.get('/users',async (req, res) => {
     let users = await Players.find();

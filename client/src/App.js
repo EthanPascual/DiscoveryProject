@@ -23,12 +23,12 @@ function App() {
         const jsonData = await response.json();
         const wordList = jsonData.list;
         console.log(wordsList);
-        setWordsList(wordList);
+        setWordsList(wordsList);
         
       }
       
-      let length = wordsList.length;
-      let randomName = wordsList[Math.floor(Math.random() * length)] + wordsList[Math.floor(Math.random() * length)];
+      let length = wordList.length;
+      let randomName = wordList[Math.floor(Math.random() * length)] + wordList[Math.floor(Math.random() * length)];
       return randomName;
     } catch (error) {
       console.error('Error:', error);
