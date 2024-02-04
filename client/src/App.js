@@ -28,12 +28,14 @@ function App() {
             setWordsList(wordList);
           }
 
-          let randomName = getRandomName();
-          setCookie("user", randomName, { path: "/" });
-
-          await axios.post('http://localhost:8000/newUsers', {
-            UserName: randomName
-          });
+          if (wordList.length > 0) { 
+            let randomName = getRandomName();
+            setCookie("user", randomName, { path: "/" });
+  
+            await axios.post('http://localhost:8000/newUsers', {
+              UserName: randomName
+            });
+          }
         } catch (error) {
           console.error('Error setting cookie:', error);
         }
@@ -51,6 +53,7 @@ function App() {
 
   let user = cookies.user;
   console.log(user);
+
   return (
     <Router>
       <Routes>
