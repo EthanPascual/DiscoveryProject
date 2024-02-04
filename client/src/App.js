@@ -1,5 +1,5 @@
 import Homepage from "./components/Homepage";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './stylesheets/index.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import GameRoom from "./components/GameRoom";
@@ -11,25 +11,21 @@ import axios from "axios";
 
 function App() {
 
-  const [wordList, setWordsList] = useState([]);
+  const [wordsList, setWordsList] = useState([]);
 
   const getRandomName = async () => {
     try {
-      if(wordList.length === 0){
+      if(wordsList.length === 0){
         const response = await fetch('/words.json');
-        
         if (!response.ok) {
             throw new Error('Failed to fetch data');
         }
-
         const jsonData = await response.json();
-        const wordsList = jsonData.list;
+        const wordList = jsonData.list;
         console.log(wordsList);
         setWordsList(wordList);
         
       }
-
-      
       
       let length = wordsList.length;
       let randomName = wordsList[Math.floor(Math.random() * length)] + wordsList[Math.floor(Math.random() * length)];
