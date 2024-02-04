@@ -12,56 +12,45 @@ import axios from "axios";
 function App() {
 
   const [wordList, setWordsList] = useState([]);
+  const [cookies, setCookie] = useCookies(["user"]);
 
-  const getRandomName = async () => {
-    try {
-      if(wordList.length === 0){
-        const response = await fetch('/words.json');
-        if (!response.ok) {
-            throw new Error('Failed to fetch data');
-        }
-        const jsonData = await response.json();
-        const wordList = jsonData.list;
-        console.log(wordList);
-        setWordsList(wordList);
-        
-      }
-      
-      let length = wordList.length;
-      let randomName = wordList[Math.floor(Math.random() * length)] + wordList[Math.floor(Math.random() * length)];
-      return randomName;
-    } catch (error) {
-      console.error('Error:', error);
-      throw error;
-    }
-  }
-  const setCookieIfNewUser = async () => {
-    if (!cookies.user) {
+  useEffect(() => {
+    const setCookieIfNewUser = async () => {
+      if (!cookies.user) {
         try {
-            let randomName = await getRandomName();
-            console.log(randomName);
+          if (wordList.length === 0) {
+            const response = await fetch('/words.json');
+            if (!response.ok) {
+              throw new Error('Failed to fetch data');
+            }
+            const jsonData = await response.json();
+            const wordList = jsonData.list;
+            setWordsList(wordList);
+          }
 
-            //REMEMBER TO ADD THIS NAME TO OUR DATABASE, AS WELL AS MAKING SURE IT ISNT ALREADY USED
+          let randomName = getRandomName();
+          setCookie("user", randomName, { path: "/" });
 
-
-
-            setCookie("user", randomName, { path: "/" });
-
-            await axios.post('http://localhost:8000/newUsers',{
-              UserName: randomName
-            });
-
-
+          await axios.post('http://localhost:8000/newUsers', {
+            UserName: randomName
+          });
         } catch (error) {
-            console.error('Error setting cookie:', error);
+          console.error('Error setting cookie:', error);
         }
-    }
-};
+      }
+    };
 
-const [cookies, setCookie] = useCookies(["user"]);
-setCookieIfNewUser();
-let user = cookies.user;
-console.log(user);
+    setCookieIfNewUser();
+  }, [cookies.user, wordList, setCookie]);
+
+  const getRandomName = () => {
+    let length = wordList.length;
+    let randomName = wordList[Math.floor(Math.random() * length)] + wordList[Math.floor(Math.random() * length)];
+    return randomName;
+  }
+
+  let user = cookies.user;
+  console.log(user);
   return (
     <Router>
       <Routes>
