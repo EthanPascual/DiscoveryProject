@@ -25,7 +25,7 @@ db.on('connected', function () {
 
 app.get('/users',async (req, res) => {
     let users = await Players.find();
-    console.log(users);
+    
     res.send(users);
 });
 

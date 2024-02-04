@@ -13,6 +13,15 @@ function App() {
 
   const [wordList, setWordsList] = useState([]);
   const [cookies, setCookie] = useCookies(["user"]);
+  const [userList, setUserList] = useState([]);
+  
+  useEffect(() => {
+    axios.get('http://localhost:8000/users').then(res => {
+      
+      setUserList(res.data);
+
+    });
+  }, []);
 
   useEffect(() => {
     const setCookieIfNewUser = async () => {
@@ -29,7 +38,19 @@ function App() {
           }
 
           if (wordList.length > 0) { 
-            let randomName = getRandomName();
+            let uniqueName = false;
+            let randomName;
+
+            while(!uniqueName){
+              randomName = getRandomName();
+              if(userList.includes(randomName)){
+
+              }
+              else{
+                uniqueName = true;
+              }
+            }
+            
             setCookie("user", randomName, { path: "/" });
   
             await axios.post('http://localhost:8000/newUsers', {
@@ -53,6 +74,7 @@ function App() {
 
   let user = cookies.user;
   console.log(user);
+  console.log(userList);
 
   return (
     <Router>
