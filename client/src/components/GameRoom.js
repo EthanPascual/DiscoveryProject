@@ -1,13 +1,12 @@
 import React from 'react';
-import styles from "./GameRoom.module.css";
 
 export default function GameRoom(props){
 
     return (
       <>
-        <div className={styles.gameContainer}>
-          <div className={styles.guessesContainer}>
-            <div className={styles.yourGuesses}>
+        <div className="gameContainer">
+          <div className="guessesContainer">
+            <div className="yourGuesses">
               <h2>Your guesses</h2>
               <ul>
                 <li>
@@ -21,7 +20,7 @@ export default function GameRoom(props){
                 </li>
               </ul>
             </div>
-            <div className={styles.enemyGuesses}>
+            <div className="enemyGuesses">
               <h2>Enemy guesses</h2>
               <ul>
                 <li>
@@ -36,7 +35,7 @@ export default function GameRoom(props){
               </ul>
             </div>
           </div>
-          <div className={styles.inputArea}>
+          <div className="inputArea">
             <label htmlFor="current-guess">input current guess:</label>
             <input
               type="text"
@@ -45,7 +44,7 @@ export default function GameRoom(props){
               maxLength="5"
             />
           </div>
-          <div className={styles.notesArea}>
+          <div className="notesArea">
             <textarea placeholder="*text area for notes about the game*"></textarea>
           </div>
         </div>
