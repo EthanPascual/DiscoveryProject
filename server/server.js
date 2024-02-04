@@ -1,8 +1,11 @@
 const express = require('express');
 const app = express();
 var cors = require('cors');
+const { createServer } = require('node:http');
+const { Server } = require('socket.io');
 
 let Players = require('./models/player.js');
+let Games = require('./models/game.js')
 
 let mongoose = require('mongoose');
 let mongoDb =  "mongodb://127.0.0.1/discovery";
@@ -12,10 +15,27 @@ let db = mongoose.connection;
 const port = 8000;
 
 app.use(express.json());
-app.listen(port, () => {
-    console.log('Discovery listening on port ' + port)
+//SOCKET IO STUFF HERE
+const server = createServer(app); 
+const io = new Server(server,{
+    cors: {
+      origin: 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+  })
+
+server.listen(port, () => {
+
+    console.log('server running at port: '+ port)
+    
 })
 
+io.on('connection', (socket) => {
+
+    console.log("user connected, socket id: "+ socket.id)
+
+  });
 
 
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
