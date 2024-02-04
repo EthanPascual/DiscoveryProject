@@ -11,19 +11,19 @@ import axios from "axios";
 
 function App() {
 
-  const [wordsList, setWordsList] = useState([]);
+  const [wordList, setWordsList] = useState([]);
 
   const getRandomName = async () => {
     try {
-      if(wordsList.length === 0){
+      if(wordList.length === 0){
         const response = await fetch('/words.json');
         if (!response.ok) {
             throw new Error('Failed to fetch data');
         }
         const jsonData = await response.json();
         const wordList = jsonData.list;
-        console.log(wordsList);
-        setWordsList(wordsList);
+        console.log(wordList);
+        setWordsList(wordList);
         
       }
       
