@@ -11,26 +11,21 @@ import axios from "axios";
 
 function App() {
 
-  const [wordList, setWordsList] = useState([]);
+  const [wordsList, setWordsList] = useState([]);
 
   const getRandomName = async () => {
     try {
-      if(wordList.length === 0){
+      if(wordsList.length === 0){
         const response = await fetch('/words.json');
-
-        
         if (!response.ok) {
             throw new Error('Failed to fetch data');
         }
-
         const jsonData = await response.json();
-        const wordsList = jsonData.list;
+        const wordList = jsonData.list;
         console.log(wordsList);
         setWordsList(wordsList);
-      }  
-      
-
-      
+        
+      }
       
       let length = wordList.length;
       let randomName = wordList[Math.floor(Math.random() * length)] + wordList[Math.floor(Math.random() * length)];
