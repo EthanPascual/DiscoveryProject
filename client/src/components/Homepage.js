@@ -20,10 +20,7 @@ export default function Homepage(props){
         navigate('/stats');
     }
 
-    useEffect(() => {
-        console.log('socketing');
-        socket.connect();
-    }, []);
+
     
     const sendMessage = () => {
         console.log('sending message: ' + message);

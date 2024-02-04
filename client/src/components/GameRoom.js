@@ -1,6 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useState } from 'react';
+import axios from "axios";
+
 
 export default function GameRoom(props){
+
+    const [gameList, setGamesList] = useState([]);
+
+    useEffect(()=>{ // This is used for populating the setGamesList
+
+      axios.get('http://localhost:8000/games').then(res => {
+        setGamesList(res.data)
+        console.log(gameList)
+      });
+    }, [])
+
+    
 
     return (
       <>

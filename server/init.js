@@ -1,4 +1,5 @@
 let User = require('./models/player.js')
+let Game = require('./models/game.js')
 let userArgs = process.argv.slice(2);
 let mongoose = require('mongoose');
 let mongoDB = userArgs[0];
@@ -20,10 +21,23 @@ function playerCreate(nameOfUser) {
     return newPlayer.save();
   }
 
+  function gameCreate(game) {
+    gameDetail = {
+
+      player: [],
+
+    };
+    
+    let newGame = new Game(gameDetail);
+  
+    return newGame.save();
+  }
+
 
 const populate = async () => {
 
     await playerCreate("Testing");
+    await gameCreate("Test")
 
     if(db){
         db.close();

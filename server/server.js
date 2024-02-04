@@ -72,7 +72,16 @@ app.post('/newUsers', async (req, res) => {
     res.send("New User added!");
 })
 
-
+app.get('/games',async (req, res) => {
+    try {
+        const games = await Games.find().populate(['players']);
+        
+        res.json(games);
+      } catch (error) {
+        console.error('error getting games:', error);
+        res.status(500).json({ error: 'Error' });
+      }
+    });
 
 
 
