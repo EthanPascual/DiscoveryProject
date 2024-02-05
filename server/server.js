@@ -36,8 +36,10 @@ let waitingPlayer = null;
 
 io.on('connection', (socket) => {
     console.log('🔥: user ' + socket.id + ' connected');
+  
     socket.on('findGame', () => {
-        if (waitingPlayer) {
+        if (waitingPlayer != null) {
+            console.log("Current waiting that you are matched with: " + waitingPlayer.id)
             const roomID = waitingPlayer.id + '#' + socket.id;
             gameRooms.set(roomID, [waitingPlayer, socket]);
             waitingPlayer.join(roomID);
@@ -45,13 +47,12 @@ io.on('connection', (socket) => {
             waitingPlayer = null;
             io.to(roomID).emit('message', 'Game Start');
         } else {
+            console.log("You are the waiting player")
             waitingPlayer = socket;
             waitingPlayer.emit('message', 'Waiting for an opponent');
         }
     });
     
-
-    console.log(gameRooms)
 
     socket.on('disconnect', () => {
       console.log('🔥: user ' + socket.id + ' disconnected');
@@ -60,11 +61,11 @@ io.on('connection', (socket) => {
             if (players.includes(socket)) {
                 socket.to(roomID).emit('message', 'Your opponent has disconnected');
                 gameRooms.delete(roomID);
-                if (waitingPlayer === socket) {
-                    waitingPlayer = null;
-                }
                 break;
             }
+        }
+        if (waitingPlayer === socket) {
+            waitingPlayer = null;
         }
     });
 

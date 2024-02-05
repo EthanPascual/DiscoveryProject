@@ -67,6 +67,31 @@ body, html {
     font-size: 1.6vw; 
 }
 
+
+.lastHourTable {
+    text-align: center;
+}
+
+.lastHourContainer {
+    display: flex;
+    flex-direction: column; 
+    overflow-y: auto;
+    max-height: 165px; 
+    
+}
+
+.lastHourHeader {
+    font-weight: bold;
+    margin-bottom: 10px;  
+    text-align: center;
+}
+
+.lastHourTable {
+    
+    margin-bottom: 20px;  
+}
+
+
 .container {
     display: flex;
     height: 100vh;
