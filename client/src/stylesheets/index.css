@@ -67,6 +67,20 @@ body, html {
     font-size: 1.6vw; 
 }
 
+.container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .gameContainer {
+    width: 70%;
+  }
+  
+  .chatRoom {
+    width: 30%;
+  }
+
+
 .lastHourTable {
     text-align: center;
 }
@@ -89,4 +103,5 @@ body, html {
     
     margin-bottom: 20px;  
 }
+
 

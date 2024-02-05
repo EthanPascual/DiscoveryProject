@@ -20,12 +20,16 @@ export default function GameRoom(props){
       });
     }, [])
 
-    const sendMessage = () => {
-      console.log('sending message: ' + message);
-      setChatlog([...chatLog, 'me: ' + message]);
-      socket.emit('message', message.toString());
-  }
-  
+    const handleKeyPress = (event) => {
+      if(event.key == 'Enter'){
+        console.log('sending message: ' + message);
+        setChatlog([...chatLog, 'me: ' + message]);
+        socket.emit('message', message.toString());
+        setMessage('');
+      }
+    }
+
+
   const handleInputChange = (e) => {
       setMessage(e.target.value);
   }
@@ -38,10 +42,7 @@ export default function GameRoom(props){
 
     return (
       <>
-      <div>
-
-        
-      </div>
+      <div className='container'>
         <div className="gameContainer">
           <div className="guessesContainer">
             <div className="yourGuesses">
@@ -87,13 +88,13 @@ export default function GameRoom(props){
           </div>
         </div>
         <div className = "chatRoom">
-          <input type='text' onChange={handleInputChange}/>
-                <button onClick={sendMessage}> Send Message to Server via Sockets</button>
+          <input type='text' id='chatInput' onKeyPress={handleKeyPress} onChange={handleInputChange} placeholder='Chat with your opponent...' value={message}/>
                 <ul>
                     {chatLog.map((message, index) => (
                     <li key={index}>{message}</li>
                     ))}
                 </ul>
+        </div>
         </div>
       </>
       
