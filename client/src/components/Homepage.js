@@ -24,7 +24,7 @@ export default function Homepage(props){
 
     return(
         <>
-            <div class="home-container">
+            <div className="home-container">
                 <h1>Welcome to the Wordle Game</h1>
                 <button onClick={goToGameRoom}>Start Game</button>
                 <button onClick={goToStats}>Stats</button>
