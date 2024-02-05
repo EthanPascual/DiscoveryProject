@@ -85,7 +85,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Homepage user={user}/> } />
         <Route path="/gameroom" element={<GameRoom />} />
-        <Route path="/stats" element={<Stats />} />
+        <Route path="/stats" element={<Stats user={user}/>} />
       </Routes>
     </Router>
   );
