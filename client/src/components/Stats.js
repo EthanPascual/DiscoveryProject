@@ -25,6 +25,7 @@ export default function Stats(props) {
 
     }, []);
 
+
     console.log(userList);
     console.log(gameList);
 

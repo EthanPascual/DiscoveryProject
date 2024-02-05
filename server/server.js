@@ -19,7 +19,7 @@ app.use(express.json());
 const server = createServer(app); 
 const io = new Server(server,{
     cors: {
-      origin: 'http://localhost:3000',
+      origin: '*',
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -29,18 +29,52 @@ server.listen(port, () => {
 
     console.log('server running at port: '+ port)
 
-})
+});
+
+let gameRooms = new Map();
+let waitingPlayer = null;
 
 io.on('connection', (socket) => {
     console.log('🔥: user ' + socket.id + ' connected');
-    socket.join("room1");
+
+    if (waitingPlayer) {
+        const roomID = waitingPlayer.id + '#' + socket.id;
+        gameRooms.set(roomID, [waitingPlayer, socket]);
+        waitingPlayer.join(roomID);
+        socket.join(roomID);
+        waitingPlayer = null;
+        io.to(roomID).emit('message', 'Game Start');
+    } else {
+        waitingPlayer = socket;
+        waitingPlayer.emit('message', 'Waiting for an opponent');
+    }
+
+    console.log(gameRooms)
+
     socket.on('disconnect', () => {
       console.log('🔥: user ' + socket.id + ' disconnected');
+
+        for (let [roomID, players] of gameRooms) {
+            if (players.includes(socket)) {
+                socket.to(roomID).emit('message', 'Your opponent has disconnected');
+                gameRooms.delete(roomID);
+                if (waitingPlayer === socket) {
+                    waitingPlayer = null;
+                }
+                break;
+            }
+        }
     });
 
     socket.on('message', (message) => {
         console.log('📩: message received: ' + message);
-        socket.to('room1').emit('message', message);
+
+        for (let [roomID, players] of gameRooms) {
+            if (players.includes(socket)) {
+                socket.to(roomID).emit('message', message);
+                break;
+            }
+        }
     });
 
   });

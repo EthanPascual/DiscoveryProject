@@ -7,8 +7,8 @@ import Stats from "./components/Stats"
 import { CookiesProvider, useCookies} from 'react-cookie';
 import axios from "axios";
 import { io } from 'socket.io-client';
-
 export const socket = io('http://localhost:8000');
+
 
 
 function App() {
@@ -16,13 +16,7 @@ function App() {
   const [wordList, setWordsList] = useState([]);
   const [cookies, setCookie] = useCookies(["user"]);
   const [userList, setUserList] = useState([]);
-  //const socket = io('http://localhost:8000');
-
-  useEffect(() => {
-
-      socket.connect();
-    
-  }, []);
+  
 
   useEffect(() => {
 
