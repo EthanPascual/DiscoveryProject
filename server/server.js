@@ -36,18 +36,20 @@ let waitingPlayer = null;
 
 io.on('connection', (socket) => {
     console.log('🔥: user ' + socket.id + ' connected');
-
-    if (waitingPlayer) {
-        const roomID = waitingPlayer.id + '#' + socket.id;
-        gameRooms.set(roomID, [waitingPlayer, socket]);
-        waitingPlayer.join(roomID);
-        socket.join(roomID);
-        waitingPlayer = null;
-        io.to(roomID).emit('message', 'Game Start');
-    } else {
-        waitingPlayer = socket;
-        waitingPlayer.emit('message', 'Waiting for an opponent');
-    }
+    socket.on('findGame', () => {
+        if (waitingPlayer) {
+            const roomID = waitingPlayer.id + '#' + socket.id;
+            gameRooms.set(roomID, [waitingPlayer, socket]);
+            waitingPlayer.join(roomID);
+            socket.join(roomID);
+            waitingPlayer = null;
+            io.to(roomID).emit('message', 'Game Start');
+        } else {
+            waitingPlayer = socket;
+            waitingPlayer.emit('message', 'Waiting for an opponent');
+        }
+    });
+    
 
     console.log(gameRooms)
 
