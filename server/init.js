@@ -33,12 +33,26 @@ function playerCreate(nameOfUser) {
     return newGame.save();
   }
 
+  function gameCreateFull(player1, player2, date, players) {
+    gameDetail = {
+      winner: player1,
+      loser: player2,
+      date: date,
+      player: players
+
+    };
+    
+    let newGame = new Game(gameDetail);
+  
+    return newGame.save();
+  }
+
 
 const populate = async () => {
-
-    await playerCreate("Testing");
+    let p1 = await playerCreate("Tester 1");
+    let p2 = await playerCreate("Tester 2");
     await gameCreate("Test")
-
+    await gameCreateFull(p1, p2, new Date(), [p1, p2]);
     if(db){
         db.close();
     }
