@@ -47,31 +47,11 @@ export default function GameRoom(props){
           <div className="guessesContainer">
             <div className="yourGuesses">
               <h2>Your guesses</h2>
-              <ul>
-                <li>
-                  <p>HELLO 2</p>
-                </li>
-                <li>
-                  <p>TEETH 0</p>
-                </li>
-                <li>
-                  <p>HOUSE 0</p>
-                </li>
-              </ul>
+              
             </div>
             <div className="enemyGuesses">
               <h2>Enemy guesses</h2>
-              <ul>
-                <li>
-                  <p>HELLO 0</p>
-                </li>
-                <li>
-                  <p>ALLAH 0</p>
-                </li>
-                <li>
-                  <p>INUET 1</p>
-                </li>
-              </ul>
+              
             </div>
           </div>
           <div className="inputArea">
