@@ -5,7 +5,7 @@ import { set } from 'mongoose';
 import io from "socket.io-client";
 import {socket} from '../App';
 import WaitingRoom from "./WaitingRoom.js"
-
+import Countdown from './Countdown.js'
 
 
 export default function Homepage({user}){
@@ -13,6 +13,7 @@ export default function Homepage({user}){
     
     let navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
+    const [gameFound, setGameFound] = useState(false);
 
     const goToGameRoom = () => {
         setShowModal(true)
@@ -28,7 +29,11 @@ export default function Homepage({user}){
             if (message === 'Game Start') {
                 console.log('Game started!'); 
                 setShowModal(false);
-                navigate('/gameroom');
+                setGameFound(true);
+                setTimeout(() => {
+                    navigate('/gameroom');
+                }, 5000); // 5 seconds timeout
+                
             }
         });
 
@@ -44,6 +49,7 @@ export default function Homepage({user}){
         <>
 
             {showModal && <WaitingRoom />}
+            {gameFound && <Countdown />}
             <div className="home-container">
                 <h1>Welcome to the Wordle Game, {user}</h1>
                 
