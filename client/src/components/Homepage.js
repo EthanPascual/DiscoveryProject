@@ -6,17 +6,21 @@ import io from "socket.io-client";
 import {socket} from '../App';
 import WaitingRoom from "./WaitingRoom.js"
 import Countdown from './Countdown.js'
+import ChooseWordModal from './ChooseWordModal.js'
 
 
 export default function Homepage({user}){
 
     
     let navigate = useNavigate();
+    const [chooseWord, setChooseWord] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [gameFound, setGameFound] = useState(false);
+    const [chosenWord, setChosenWord] = useState('');
 
     const goToGameRoom = () => {
         setShowModal(true)
+        console.log("showing modal")
         socket.emit('findGame');
         
     };
@@ -24,7 +28,18 @@ export default function Homepage({user}){
         navigate('/stats');
     }
 
+    const pickWord = () => {
+        setChooseWord(true);
+        console.log("picking word")
+    }
+
     useEffect(() => {
+        socket.on('createdMessage', (word) => {
+            console.log("word was found");
+            setChosenWord(word);
+            setChooseWord(false);
+            goToGameRoom();
+        });
         socket.on('message', (message) => {
             if (message === 'Game Start') {
                 console.log('Game started!'); 
@@ -38,8 +53,10 @@ export default function Homepage({user}){
         });
 
         return () => {
+            socket.off('createdMessage');
             socket.off('Game Start');
         };
+
     }, []);
 
 
@@ -47,7 +64,7 @@ export default function Homepage({user}){
 
     return(
         <>
-
+            {chooseWord && <ChooseWordModal />}
             {showModal && <WaitingRoom />}
             {gameFound && <Countdown />}
             <div className="home-container">
@@ -57,7 +74,7 @@ export default function Homepage({user}){
                 
             </div>
             <div className="home-buttons">
-                <button onClick={goToGameRoom}>Start Game</button>
+                <button onClick={pickWord}>Start Game</button>
                 <button onClick={goToStats}>Stats</button>
             </div>
         </>
