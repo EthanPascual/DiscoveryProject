@@ -3,6 +3,7 @@ import { useState } from 'react';
 import axios from "axios";
 import io from "socket.io-client";
 import {socket} from "../App";
+import GameEndModal from './GameEndModal';
 
 
 
@@ -11,6 +12,8 @@ export default function GameRoom(props){
     const [gameList, setGamesList] = useState([]);
     const [message, setMessage] = useState('');
     const [chatLog, setChatlog] = useState([]);
+    const [gameEnd, setGameEnd] = useState(false);
+    const [win, setWin] = useState(false);
 
     useEffect(()=>{ // This is used for populating the setGamesList
 
@@ -18,6 +21,18 @@ export default function GameRoom(props){
         setGamesList(res.data)
         console.log(gameList)
       });
+
+      socket.on('gameEnd', () => {
+        console.log('You Lost :(')
+        setGameEnd(true);
+        console.log(gameEnd);
+    });
+
+  
+    return () => {
+        socket.off('gameEnd');
+    }
+
     }, [])
 
     const handleKeyPress = (event) => {
@@ -27,6 +42,14 @@ export default function GameRoom(props){
         socket.emit('message', message.toString());
         setMessage('');
       }
+    }
+
+    const winning = () => {
+      console.log('You Win!!');
+      socket.emit('gameEnd');
+      setWin(true)
+      setGameEnd(true)
+      console.log(gameEnd)
     }
 
 
@@ -40,8 +63,10 @@ export default function GameRoom(props){
   });
 
 
+
     return (
       <>
+      {gameEnd && <GameEndModal win={win} />}
       <div className='container'>
         <div className="gameContainer">
           <div className="guessesContainer">
@@ -66,6 +91,7 @@ export default function GameRoom(props){
           <div className="notesArea">
             <textarea placeholder="*text area for notes about the game*"></textarea>
           </div>
+          <button onClick={winning}>Click to Simulate Win</button>
         </div>
         <div className = "chatRoom">
           <input type='text' id='chatInput' onKeyPress={handleKeyPress} onChange={handleInputChange} placeholder='Chat with your opponent...' value={message}/>
