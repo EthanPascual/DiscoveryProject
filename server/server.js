@@ -80,6 +80,22 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('gameEnd', () => { //ending the game for everyone
+        console.log("The Game has Ended");
+        for (let [roomID, players] of gameRooms) {
+            if (players.includes(socket)) {
+                socket.to(roomID).emit('gameEnd');
+                socket.leave(roomID);
+                const otherPlayerSocket = players.find(playerSocket => playerSocket !== socket);
+                otherPlayerSocket.leave(roomID);
+
+                gameRooms.delete(roomID);
+
+                break;
+            }
+        }
+    });
+
   });
 
 
