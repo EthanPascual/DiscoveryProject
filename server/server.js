@@ -38,6 +38,7 @@ io.on('connection', (socket) => {
     console.log('🔥: user ' + socket.id + ' connected');
   
     socket.on('findGame', () => {
+        console.log("finding game");
         if (waitingPlayer != null) {
             console.log("Current waiting that you are matched with: " + waitingPlayer.id)
             const roomID = waitingPlayer.id + '#' + socket.id;
@@ -95,6 +96,11 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    socket.on('createdWord', (word) => {
+        console.log('Chosen Word: ' + word);
+        socket.emit('createdMessage', word);
+    })
 
   });
 
