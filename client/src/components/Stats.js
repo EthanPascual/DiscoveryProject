@@ -5,10 +5,28 @@ export default function Stats(props) {
     const [userList, setUserList] = useState([]);
     const [gameList, setGameList] = useState([]);
     const [sortedUsers, setSortedUsers] = useState(userList);
+    const [sortedGames, setSortedGames] = useState(gameList);
+    const [sortedHourGames, setHourGames] = useState([]);
+
+
+
+
+    
     const [sortNameOrder, setSortNameOrder] = useState('default');
     const [sortWinsOrder, setWinsSortOrder] = useState('default');
     const [sortLossOrder, setLossSortOrder] = useState('default');
     const [sortGuessOrder, setGuessSortOrder] = useState('default');
+
+    const [sortAllTimeName, setAllTimeNameOrder] = useState('default');
+    const [sortAllTimeName2, setAllTimeNameOrder2] = useState('default');
+    const [sortAllTimeWinner, setAllTimeWinner] = useState('default');
+    const [sortAllTimeLoser, setAllTimeLoser] = useState('default');
+
+    const [sortHourName, setHourNameOrder] = useState('default');
+    const [sortHourName2, setHourNameOrder2] = useState('default');
+    const [sortHourWinner, setHourWinner] = useState('default');
+    const [sortHourLoser, setHourLoser] = useState('default');
+
 
 
     useEffect(() => {
@@ -21,6 +39,13 @@ export default function Stats(props) {
 
         axios.get('http://localhost:8000/games').then(res => {
             setGameList(res.data);
+            setSortedGames(res.data);
+
+            let hourList = res.data
+            setHourGames(hourList.filter((game) => {
+                const gameTimestamp = new Date(game.date).getTime();
+                return currentTimestamp - gameTimestamp < 3600000;
+            }));
         });
 
     }, []);
@@ -28,6 +53,218 @@ export default function Stats(props) {
 
     console.log(userList);
     console.log(gameList);
+
+    const handleSortHourGames = (param) => {
+        let sorted;
+
+        if(param == 'Name1'){
+
+            switch (sortHourName){
+
+                case 'default':
+                    sorted = [...sortedHourGames].sort((a,b) => a.players[0].name.localeCompare(b.players[0].name));
+                    setHourNameOrder("alphabetical");
+                    break;
+                case 'alphabetical':
+                    sorted = [...sortedHourGames].sort((a,b) => b.players[0].name.localeCompare(a.players[0].name));
+                    setHourNameOrder("reverse");
+                    break;
+                case 'reverse':
+                    sorted = sortedHourGames;
+                    setHourNameOrder('default');
+                    break;
+                default:
+                    sorted = sortedHourGames;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+
+        if(param == 'Name2'){
+
+            switch (sortHourName2){
+                case 'default':
+                    sorted = [...sortedHourGames].sort((a,b) => a.players[1].name.localeCompare(b.players[1].name));
+                    setHourNameOrder2("alphabetical");
+                    break;
+                case 'alphabetical':
+                    sorted = [...sortedHourGames].sort((a,b) => b.players[1].name.localeCompare(a.players[1].name));
+                    setHourNameOrder2("reverse");
+                    break;
+                case 'reverse':
+                    sorted = sortedHourGames;
+                    setHourNameOrder2('default');
+                    break;
+                default:
+                    sorted = sortedHourGames;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+
+        if(param == 'NameWin'){
+
+            switch (sortHourWinner){
+                case 'default':
+                    sorted = [...sortedHourGames].sort((a,b) => a.winner.name.localeCompare(b.winner.name));
+                    setHourWinner("alphabetical");
+                    break;
+                case 'alphabetical':
+                    sorted = [...sortedHourGames].sort((a,b) => b.winner.name.localeCompare(a.winner.name));
+                    setHourWinner("reverse");
+                    break;
+                case 'reverse':
+                    sorted = sortedHourGames;
+                    setHourWinner('default');
+                    break;
+                default:
+                    sorted = sortedHourGames;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+
+        if(param == 'NameLose'){
+
+            switch (sortHourLoser){
+                case 'default':
+                    sorted = [...sortedHourGames].sort((a,b) => a.loser.name.localeCompare(b.loser.name));
+                    setHourLoser('alphabetical');
+                    break;
+                case 'alphabetical':
+                    sorted = [...sortedHourGames].sort((a,b) => b.loser.name.localeCompare(a.loser.name));
+                    setHourLoser('reverse');
+                    break;
+                case 'reverse':
+                    sorted = sortedHourGames;
+                    setHourLoser('default');
+                    break;
+                default:
+                    sorted = sortedHourGames;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+
+        
+    }
+
+    const handleSortAllTimeGames = (param) => {
+        let sorted;
+
+        if(param == 'Name1'){
+
+            switch (sortAllTimeName){
+
+                case 'default':
+                    sorted = [...gameList].sort((a,b) => a.players[0].name.localeCompare(b.players[0].name));
+                    setAllTimeNameOrder("alphabetical");
+                    break;
+                case 'alphabetical':
+                    sorted = [...gameList].sort((a,b) => b.players[0].name.localeCompare(a.players[0].name));
+                    setAllTimeNameOrder("reverse");
+                    break;
+                case 'reverse':
+                    sorted = gameList;
+                    setAllTimeNameOrder('default');
+                    break;
+                default:
+                    sorted = gameList;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+
+        if(param == 'Name2'){
+
+            switch (sortAllTimeName2){
+                case 'default':
+                    sorted = [...gameList].sort((a,b) => a.players[1].name.localeCompare(b.players[1].name));
+                    setAllTimeNameOrder2("alphabetical");
+                    break;
+                case 'alphabetical':
+                    sorted = [...gameList].sort((a,b) => b.players[1].name.localeCompare(a.players[1].name));
+                    setAllTimeNameOrder2("reverse");
+                    break;
+                case 'reverse':
+                    sorted = gameList;
+                    setAllTimeNameOrder2('default');
+                    break;
+                default:
+                    sorted = gameList;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+
+        if(param == 'NameWin'){
+
+            switch (sortAllTimeWinner){
+                case 'default':
+                    sorted = [...gameList].sort((a,b) => a.winner.name.localeCompare(b.winner.name));
+                    setAllTimeWinner("alphabetical");
+                    break;
+                case 'alphabetical':
+                    sorted = [...gameList].sort((a,b) => b.winner.name.localeCompare(a.winner.name));
+                    setAllTimeWinner("reverse");
+                    break;
+                case 'reverse':
+                    sorted = gameList;
+                    setAllTimeWinner('default');
+                    break;
+                default:
+                    sorted = gameList;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+
+        if(param == 'NameLose'){
+
+            switch (sortAllTimeLoser){
+                case 'default':
+                    sorted = [...gameList].sort((a,b) => a.loser.name.localeCompare(b.loser.name));
+                    setAllTimeLoser('alphabetical');
+                    break;
+                case 'alphabetical':
+                    sorted = [...gameList].sort((a,b) => b.loser.name.localeCompare(a.loser.name));
+                    setAllTimeLoser('reverse');
+                    break;
+                case 'reverse':
+                    sorted = gameList;
+                    setAllTimeLoser('default');
+                    break;
+                default:
+                    sorted = gameList;
+                
+                
+            }
+
+            setSortedGames(sorted);
+
+        }
+    }
 
     const handleSortUsers = (param) => {
         let sorted;
@@ -150,6 +387,7 @@ export default function Stats(props) {
     let currentUser = userList.find(user => user.name == props.user);
     console.log(currentUser);
     let currentTimestamp = new Date().getTime();
+    
 
     return (
         <>
@@ -177,24 +415,36 @@ export default function Stats(props) {
                         <thead>
                             <tr>
                                 <th>Player 1
+                                <button onClick={() => handleSortHourGames('Name1')}>
+                                    {sortHourName === 'default' ? '>' : sortHourName === 'reverse' ? '=' : '<'}
+                                </button>
                                 </th>
                                 <th></th>
-                                <th>Player 2</th>
-                                <th>Winner</th>
-                                <th>Loser</th>
+                                <th>Player 2
+                                <button onClick={() => handleSortHourGames('Name2')}>
+                                    {sortHourName2 === 'default' ? '>' : sortHourName2 === 'reverse' ? '=' : '<'}
+                                </button>
+                                </th>
+                                <th>Winner
+                                <button onClick={() => handleSortHourGames('NameWin')}>
+                                    {sortHourWinner === 'default' ? '>' : sortHourWinner === 'reverse' ? '=' : '<'}
+                                </button>
+                                </th>
+                                <th>Loser
+                                <button onClick={() => handleSortHourGames('NameLose')}>
+                                    {sortHourLoser === 'default' ? '>' : sortHourLoser === 'reverse' ? '=' : '<'}
+                                </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             {userList ? (
-                                gameList.length === 0 ? (
+                                sortedHourGames.length === 0 ? (
                                     <tr>
                                         <td colSpan="5">No games found</td>
                                     </tr>
                                 ) : (
-                                    gameList.filter((game) => {
-                                        const gameTimestamp = new Date(game.date).getTime();
-                                        return currentTimestamp - gameTimestamp < 3600000;
-                                    }).map((game) => (
+                                    sortedHourGames.map((game) => (
                                         <tr key={game._id}>
                                             <td>
                                                 {userList.find((user) => user._id == game.players[0])?.name}
@@ -229,11 +479,28 @@ export default function Stats(props) {
                 <table className="lastHourTable">
                     <thead>
                         <tr>
-                            <th>Player 1</th>
+                            <th>Player 1
+                            <button onClick={() => handleSortAllTimeGames('Name1')}>
+                                    {sortAllTimeName === 'default' ? '>' : sortAllTimeName === 'reverse' ? '=' : '<'}
+                            </button>
+                            </th>
                             <th></th>
-                            <th>Player 2</th>
-                            <th>Winner</th>
-                            <th>Loser</th>
+                            <th>Player 2
+                            <button onClick={() => handleSortAllTimeGames('Name2')}>
+                                    {sortAllTimeName2 === 'default' ? '>' : sortAllTimeName2 === 'reverse' ? '=' : '<'}
+                            </button>
+                            </th>
+                            <th>Winner
+                            <button onClick={() => handleSortAllTimeGames('NameWin')}>
+                                    {sortAllTimeWinner === 'default' ? '>' : sortAllTimeWinner === 'reverse' ? '=' : '<'}
+                            </button>
+                            </th>
+
+                            <th>Loser
+                            <button onClick={() => handleSortAllTimeGames('NameLose')}>
+                                    {sortAllTimeLoser === 'default' ? '>' : sortAllTimeLoser === 'reverse' ? '=' : '<'}
+                            </button>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -243,7 +510,7 @@ export default function Stats(props) {
                                     <td colSpan="5">No games found</td>
                                 </tr>
                             ) : (
-                                gameList.map((game) => (
+                                sortedGames.map((game) => (
                                     <tr key={game._id}>
                                         <td>
                                             {userList.find((user) => user._id == game.players[0])?.name}
@@ -258,7 +525,7 @@ export default function Stats(props) {
                                         <td>{userList.find((user) => user._id == game.loser)?.name}</td>
                                     </tr>
                                 ))
-                            )
+                            )   
                         ) : (
                             <tr>
                                 <td colSpan="5">User data not available</td>
@@ -303,8 +570,12 @@ export default function Stats(props) {
 
                         </tr>
                     </thead>
-                    <tbody className="scrollable">
-                        {userList ? (
+                    <tbody>
+                        {userList ? ( userList.length == 0 ? (
+                                <tr>
+                                    <td colSpan="5">No Users found</td>
+                                </tr>
+                            ) : (
                             sortedUsers.map((user) => (
                                 <tr >
                                     <td>
@@ -322,6 +593,7 @@ export default function Stats(props) {
                                 </tr>
                             )
                             )
+                            )   
                         ) : (
                             <tr>
                                 <td colSpan="5">User data not available</td>
