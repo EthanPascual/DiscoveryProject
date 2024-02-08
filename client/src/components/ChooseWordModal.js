@@ -3,7 +3,7 @@ import {socket} from '../App'
 import {useState} from 'react';
 
 
-export default function ChooseWordModal(){
+export default function ChooseWordModal({words}){
     let navigate = useNavigate();
 
     const [message, setMessage] = useState('');

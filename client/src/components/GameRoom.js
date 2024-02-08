@@ -14,6 +14,7 @@ export default function GameRoom({user}){
     const [chatLog, setChatlog] = useState([]);
     const [gameEnd, setGameEnd] = useState(false);
     const [win, setWin] = useState(false);
+    const [turn, setTurn] = useState(false);
 
     useEffect(()=>{ // This is used for populating the setGamesList
 
@@ -26,7 +27,9 @@ export default function GameRoom({user}){
         console.log('You Lost :(')
         setGameEnd(true);
         console.log(gameEnd);
-    });
+      });
+
+      
 
   
     return () => {
