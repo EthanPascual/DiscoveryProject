@@ -9,7 +9,7 @@ import Countdown from './Countdown.js'
 import ChooseWordModal from './ChooseWordModal.js'
 
 
-export default function Homepage({user}){
+export default function Homepage({user, words}){
 
     
     let navigate = useNavigate();
@@ -64,7 +64,7 @@ export default function Homepage({user}){
 
     return(
         <>
-            {chooseWord && <ChooseWordModal />}
+            {chooseWord && <ChooseWordModal words={words} />}
             {showModal && <WaitingRoom />}
             {gameFound && <Countdown />}
             <div className="home-container">
