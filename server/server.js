@@ -59,7 +59,7 @@ io.on('connection', (socket) => {
                 name2: player2
             })
             waitingPlayer = null;
-            io.to(roomID).emit('message', 'Game Start');
+            io.to(roomID).emit('gameStart', starts);
         } else {
 
             console.log("You are the waiting player")
@@ -94,7 +94,7 @@ io.on('connection', (socket) => {
         console.log('📩: message received: ' + message);
 
         for (let [roomID, players] of gameRooms) {
-            if (players.includes(socket)) {
+            if (players.players.includes(socket)) {
                 socket.to(roomID).emit('message', message);
                 break;
             }
@@ -137,27 +137,18 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('count', (data) => {
-        console.log(`Count received: ${data}`);
-        for (let [key, game] of gameRooms.entries()) {
-            if (game.players.includes(socket)) {
-                socket.to(key).emit('count', data);
-                break;
-            }
-        }
-    });
 
     socket.on('gameEnd', (winningUser) => { //ending the game for everyone
         console.log("The Game has Ended");
         console.log(winningUser);
         for (let [roomID, players] of gameRooms) {
-            if (players.includes(socket)) {
+            if (players.players.includes(socket)) {
                 axios.put(`http://localhost:8000/updateGame`, {
                     winner: winningUser
                 });
                 socket.to(roomID).emit('gameEnd');
                 socket.leave(roomID);
-                const otherPlayerSocket = players.find(playerSocket => playerSocket !== socket);
+                const otherPlayerSocket = players.players.find(playerSocket => playerSocket !== socket);
                 otherPlayerSocket.leave(roomID);
 
                 gameRooms.delete(roomID);
@@ -199,12 +190,6 @@ db.on('connected', function () {
 app.post('/newUsers', async (req, res) => {
     console.log('Received request body:', req.body);
 
-        const newUser = new Players({
-            name: req.body.UserName,
-            wins: 0,
-            losses: 0,
-            totalGuess: 0
-        });
         const newUser = new Players({
             name: req.body.UserName,
             wins: 0,
@@ -281,5 +266,3 @@ app.post('/newUsers', async (req, res) => {
     });
 
 
-
-});
