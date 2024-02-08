@@ -14,6 +14,7 @@ export default function GameRoom(props){
     const [chatLog, setChatlog] = useState([]);
     const [gameEnd, setGameEnd] = useState(false);
     const [win, setWin] = useState(false);
+    const [turn, setTurn] = useState(false);
 
     useEffect(()=>{ // This is used for populating the setGamesList
 
@@ -26,11 +27,18 @@ export default function GameRoom(props){
         console.log('You Lost :(')
         setGameEnd(true);
         console.log(gameEnd);
-    });
+      });
+
+      socket.on('turn', (playerID) => {
+        console.log("in here")
+        setTurn(playerID === socket.id);
+        console.log(`It's ${playerID === socket.id ? 'your' : 'opponent'} turn.`);
+      });
 
   
     return () => {
         socket.off('gameEnd');
+        socket.off('turn')
     }
 
     }, [])
