@@ -210,7 +210,6 @@ export default function GameRoom({ user, words }) {
           <div className="notesArea">
             <textarea placeholder="*text area for notes about the game*"></textarea>
           </div>
-          <button onClick={winning}>Click to Simulate Win</button>
         </div>
         <div className="chatRoom">
           <input type='text' id='chatInput' onKeyDown={handleKeyPressChat} onChange={handleInputChange} placeholder='Chat with your opponent...' value={message} />
