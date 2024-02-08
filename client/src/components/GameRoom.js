@@ -78,10 +78,6 @@ export default function GameRoom({user}){
       socket.emit('gameStart');
     }, []);
 
-    useEffect(() => {
-      console.log('The game has started');
-      socket.emit('gameStart');
-    }, []);
 
   const handleKeyPressChat = (event) => {
     if(event.key == 'Enter'){

@@ -45,7 +45,7 @@ export default function Homepage({user, words}){
             setChooseWord(false);
             goToGameRoom();
         });
-        socket.on('gameStart', ({ starts }) => {
+        socket.on('gameStart', (starts) => {
             console.log('Game started! First turn:', starts); 
             setCurrentTurn(starts);
             setShowModal(false);

@@ -59,6 +59,7 @@ io.on('connection', (socket) => {
                 name2: player2
             })
             waitingPlayer = null;
+            console.log('starts: ' + starts);
             io.to(roomID).emit('gameStart', starts);
         } else {
 
