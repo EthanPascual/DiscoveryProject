@@ -6,7 +6,10 @@ import {socket} from "../App";
 import GameEndModal from './GameEndModal';
 import { useGame } from './GameContext';
 
-export default function GameRoom(props){
+export default function GameRoom({user}){
+
+
+export default function GameRoom({user}){
 
   //const [gameList, setGamesList] = useState([]);
   const [message, setMessage] = useState('');
@@ -67,6 +70,9 @@ export default function GameRoom(props){
         socket.off('count', countListener);
     }
 
+    
+
+
     }, [])
 
   const handleKeyPressChat = (event) => {
@@ -110,13 +116,13 @@ export default function GameRoom(props){
     return matchCount;
   };
 
-  const winning = () => {
-    console.log('You Win!!');
-    socket.emit('gameEnd');
-    setWin(true)
-    setGameEnd(true)
-    console.log(gameEnd)
-  }
+    const winning = () => {
+      console.log('You Win!!');
+      socket.emit('gameEnd', user);
+      setWin(true)
+      setGameEnd(true)
+      console.log(gameEnd)
+    }
 
   const handleInputChange = (e) => {
     setMessage(e.target.value);

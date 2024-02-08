@@ -54,6 +54,10 @@ io.on('connection', (socket) => {
             gameRooms.set(roomID, { players: [waitingPlayer, socket], turn: starts });
             waitingPlayer.join(roomID);
             socket.join(roomID);
+            axios.post("http://localhost:8000/newGames", {
+                name1: userParam,
+                name2: player2
+            })
             waitingPlayer = null;
             io.to(roomID).emit('message', 'Game Start');
         } else {
@@ -120,10 +124,37 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('gameEnd', () => { //ending the game for everyone
+    socket.on('guess', (guess) => {
+        for (let [roomID, game] of gameRooms.entries()) {
+            if (game.players.includes(socket) && game.turn === socket.id) {
+                game.turn = game.players.find(player => player.id !== socket.id).id;
+
+                console.log(game.turn, "turn");
+                io.to(roomID).emit('turn', game.turn);
+                socket.to(roomID).emit('opponentGuess', guess);
+                break;
+            }
+        }
+    });
+
+    socket.on('count', (data) => {
+        console.log(`Count received: ${data}`);
+        for (let [key, game] of gameRooms.entries()) {
+            if (game.players.includes(socket)) {
+                socket.to(key).emit('count', data);
+                break;
+            }
+        }
+    });
+
+    socket.on('gameEnd', (winningUser) => { //ending the game for everyone
         console.log("The Game has Ended");
+        console.log(winningUser);
         for (let [roomID, players] of gameRooms) {
             if (players.includes(socket)) {
+                axios.put(`http://localhost:8000/updateGame`, {
+                    winner: winningUser
+                });
                 socket.to(roomID).emit('gameEnd');
                 socket.leave(roomID);
                 const otherPlayerSocket = players.find(playerSocket => playerSocket !== socket);
@@ -189,8 +220,8 @@ app.post('/newUsers', async (req, res) => {
 
         console.log("Received Game Players: ", req.body);
 
-        let p1 = await Players.findOne({name: req.body.name1});
-        let p2 = await Players.findOne({name: req.body.name2});
+        let p1 = await Players.findOne({ name: req.body.name1 });
+        let p2 = await Players.findOne({ name: req.body.name2 });
 
         console.log(p1);
         console.log(p2);
@@ -198,7 +229,7 @@ app.post('/newUsers', async (req, res) => {
         const newGame = new Games({
 
             date: new Date(),
-            players: [p1,p2]
+            players: [p1, p2]
         })
 
         await newGame.save();
@@ -216,3 +247,39 @@ app.post('/newUsers', async (req, res) => {
             res.status(500).json({ error: 'Error' });
         }
     });
+
+    app.put('/updateGame', async (req, res) => {
+        
+        
+        console.log('Received request updated body:', req.body);
+
+        let playerWin = await Players.findOne({ name: req.body.winner })
+
+        let gameUpdate = await Games.findOne({ 
+            'players': { $in: [playerWin] },
+            winner: { $exists: false } 
+        });
+
+        let playerLoseId = gameUpdate.players.find(playerId => playerId.toString() !== playerWin._id.toString());
+        let playerLose = await Players.findById(playerLoseId);
+
+        playerWin.wins += 1;
+        playerLose.losses += 1;
+
+        await playerWin.save();
+        await playerLose.save();
+
+        gameUpdate.winner = playerWin;
+        gameUpdate.loser = playerLose;
+
+
+        await gameUpdate.save();
+
+        res.send("Game Updated!");
+
+       
+    });
+
+
+
+});
