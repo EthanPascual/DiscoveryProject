@@ -79,10 +79,15 @@ export default function GameRoom(props){
   }
 
   const handleKeyPressGuess = (event) => {
+      //console.log("your id: ",myPlayerId);
     if (event.key == 'Enter') {
-
-      console.log("your id",myPlayerId);
-      tryGuessWord();
+      //tryGuessWord();
+      console.log('handling enter press')
+      console.log(myPlayerId);
+      console.log(currentTurn);
+      if (myPlayerId === currentTurn) {
+        tryGuessWord();
+      }
     }
   }
 
@@ -124,11 +129,19 @@ export default function GameRoom(props){
         <div className="guessesContainer">
           <div className="yourGuesses">
             <h2>Your guesses</h2>
-            <ul></ul>
+            <ul>
+              {yourGuessLog.map((guess, index) => (
+                <li key={index}>{guess}</li>
+              ))}
+            </ul>
           </div>
           <div className="enemyGuesses">
             <h2>Enemy guesses</h2>
-            <ul></ul>
+            <ul>
+              {enemyGuessLog.map((guess, index) => (
+                <li key={index}>{guess}</li>
+              ))}
+            </ul>
           </div>
         </div>
         <div className="inputArea">

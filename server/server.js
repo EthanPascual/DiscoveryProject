@@ -160,9 +160,13 @@ app.post('/newUsers', async (req, res) => {
 
 app.get('/games',async (req, res) => {
         try {
-            const games = await Games.find().populate(['players']);
-            
-            res.json(games);
+            //const games = await Games.find().populate(['players']);
+            const games = Array.from(gameRooms, ([roomID, gameData]) => ({
+                roomID,
+                players: gameData.players.map(player => player.id),
+                turn: gameData.turn,
+            }));
+            res.json({games});
         } catch (error) {
             console.error('error getting games:', error);
             res.status(500).json({ error: 'Error' });

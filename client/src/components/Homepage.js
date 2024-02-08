@@ -30,7 +30,7 @@ export default function Homepage({user}){
 
     const pickWord = () => {
         setChooseWord(true);
-        console.log("picking word")
+        //console.log("picking word")
     }
 
     useEffect(() => {
