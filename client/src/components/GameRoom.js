@@ -9,52 +9,85 @@ import GameEndModal from './GameEndModal';
 
 export default function GameRoom(props){
 
-    const [gameList, setGamesList] = useState([]);
-    const [message, setMessage] = useState('');
-    const [chatLog, setChatlog] = useState([]);
-    const [gameEnd, setGameEnd] = useState(false);
-    const [win, setWin] = useState(false);
+  const [gameList, setGamesList] = useState([]);
+  const [message, setMessage] = useState('');
+  const [chatLog, setChatlog] = useState([]);
+  const [yourGuessLog, setYourGuessLog] = useState([]);
+  const [enemyGuessLog, setEnemyGuessLog] = useState([]);
+  const [gameEnd, setGameEnd] = useState(false);
+  const [win, setWin] = useState(false);
+  const [guess, setGuess] = useState('');
 
-    useEffect(()=>{ // This is used for populating the setGamesList
+  useEffect(()=>{ // This is used for populating the setGamesList
 
-      axios.get('http://localhost:8000/games').then(res => {
-        setGamesList(res.data)
-        console.log(gameList)
-      });
-
-      socket.on('gameEnd', () => {
-        console.log('You Lost :(')
-        setGameEnd(true);
-        console.log(gameEnd);
+    axios.get('http://localhost:8000/games').then(res => {
+      setGamesList(res.data)
+      console.log(gameList)
     });
 
-  
+    socket.on('gameEnd', () => {
+      console.log('You Lost :(')
+      setGameEnd(true);
+      console.log(gameEnd);
+    });
+
+    const messageListener = (message) => {
+      setChatlog((chatLog) => [...chatLog, 'player 2: ' + message]);
+      console.log('message received: ' + message);
+    };
+
+    socket.on('message', messageListener);
+
+    const opponentGuessListener = (guess) => {
+      console.log('Opponent guessed: ' + guess);
+      setEnemyGuessLog((enemyGuessLog) => [...enemyGuessLog, guess]);
+    };
+
+    socket.on('opponentGuess', opponentGuessListener);
+
     return () => {
         socket.off('gameEnd');
+        socket.off('message', messageListener);
+        socket.off('opponentGuess', opponentGuessListener);
     }
+  }, [])
 
-    }, [])
-
-    const handleKeyPress = (event) => {
-      if(event.key == 'Enter'){
-        console.log('sending message: ' + message);
-        setChatlog([...chatLog, 'me: ' + message]);
-        socket.emit('message', message.toString());
-        setMessage('');
-      }
+  const handleKeyPressChat = (event) => {
+    if(event.key == 'Enter'){
+      console.log('sending message: ' + message);
+      setChatlog([...chatLog, 'me: ' + message]);
+      socket.emit('message', message.toString());
+      setMessage('');
     }
+  }
 
-    const winning = () => {
-      console.log('You Win!!');
-      socket.emit('gameEnd');
-      setWin(true)
-      setGameEnd(true)
-      console.log(gameEnd)
+  const handleKeyPressGuess = (event) => {
+    if (event.key == 'Enter') {
+      tryGuessWord();
     }
+  }
 
+  const tryGuessWord = () => {
+      console.log('guessing: ' + guess);
+      setYourGuessLog([...yourGuessLog, guess]);
+      socket.emit('guess', guess);
+      setGuess('');
+  }
+
+  const winning = () => {
+    console.log('You Win!!');
+    socket.emit('gameEnd');
+    setWin(true)
+    setGameEnd(true)
+    console.log(gameEnd)
+  }
 
   const handleInputChange = (e) => {
-      setMessage(e.target.value);
+    setMessage(e.target.value);
+  }
+
+  const handleGuessChange = (e) => {
+    setGuess(e.target.value);
   }
 
   socket.on('message', (message) => {
@@ -64,45 +97,48 @@ export default function GameRoom(props){
 
 
 
-    return (
-      <>
-      {gameEnd && <GameEndModal win={win} />}
-      <div className='container'>
-        <div className="gameContainer">
-          <div className="guessesContainer">
-            <div className="yourGuesses">
-              <h2>Your guesses</h2>
-              
-            </div>
-            <div className="enemyGuesses">
-              <h2>Enemy guesses</h2>
-              
-            </div>
+  return (
+    <>
+    {gameEnd && <GameEndModal win={win} />}
+    <div className='container'>
+      <div className="gameContainer">
+        <div className="guessesContainer">
+          <div className="yourGuesses">
+            <h2>Your guesses</h2>
+            <ul></ul>
           </div>
-          <div className="inputArea">
-            <label htmlFor="current-guess">input current guess:</label>
-            <input
-              type="text"
-              id="current-guess"
-              name="current-guess"
-              maxLength="5"
-            />
+          <div className="enemyGuesses">
+            <h2>Enemy guesses</h2>
+            <ul></ul>
           </div>
-          <div className="notesArea">
-            <textarea placeholder="*text area for notes about the game*"></textarea>
-          </div>
-          <button onClick={winning}>Click to Simulate Win</button>
         </div>
-        <div className = "chatRoom">
-          <input type='text' id='chatInput' onKeyPress={handleKeyPress} onChange={handleInputChange} placeholder='Chat with your opponent...' value={message}/>
-                <ul>
-                    {chatLog.map((message, index) => (
-                    <li key={index}>{message}</li>
-                    ))}
-                </ul>
+        <div className="inputArea">
+          <label htmlFor="current-guess">input current guess:</label>
+          <input
+            type="text"
+            id="current-guess"
+            name="current-guess"
+            maxLength="5"
+            value={guess}
+            onChange={handleGuessChange}
+            onKeyDown={handleKeyPressGuess}
+          />
+          <button onClick={tryGuessWord}>Submit Guess</button>
         </div>
+        <div className="notesArea">
+          <textarea placeholder="*text area for notes about the game*"></textarea>
         </div>
-      </>
-      
-    );
+        <button onClick={winning}>Click to Simulate Win</button>
+      </div>
+      <div className = "chatRoom">
+        <input type='text' id='chatInput' onKeyDown={handleKeyPressChat} onChange={handleInputChange} placeholder='Chat with your opponent...' value={message}/>
+              <ul>
+                  {chatLog.map((message, index) => (
+                  <li key={index}>{message}</li>
+                  ))}
+              </ul>
+      </div>
+      </div>
+    </>
+  );
 }

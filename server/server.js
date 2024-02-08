@@ -9,12 +9,15 @@ let Games = require('./models/game.js')
 
 let mongoose = require('mongoose');
 let mongoDb =  "mongodb://127.0.0.1/discovery";
-mongoose.connect(mongoDb, {useNewURLParser: true, useUnifiedTopology: true});
+mongoose.connect(mongoDb);
 let db = mongoose.connection;
 
 const port = 8000;
 
+app.use(cors());
+
 app.use(express.json());
+
 //SOCKET IO STUFF HERE
 const server = createServer(app); 
 const io = new Server(server,{
@@ -81,6 +84,22 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('guess', (guess) => {
+        // Find the room the player is in
+        let room;
+        for (let [roomID, players] of gameRooms.entries()) {
+            if (players.includes(socket)) {
+            room = roomID;
+            break;
+            }
+        }
+        console.log(room)
+        // If the player is in a room, emit the guess to the other player in the room
+        if (room) {
+            socket.to(room).emit('opponentGuess', guess); // Use a unique event for opponent's guesses
+        }
+    });
+
     socket.on('gameEnd', () => { //ending the game for everyone
         console.log("The Game has Ended");
         for (let [roomID, players] of gameRooms) {
@@ -109,39 +128,35 @@ io.on('connection', (socket) => {
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.on('connected', function () {
     console.log("connected to database")
-    app.use(cors())
+});
 
 app.get('/users',async (req, res) => {
-    let users = await Players.find();
-    
-    res.send(users);
-});
+        let users = await Players.find();
+        
+        res.send(users);
+    });
 
 app.post('/newUsers', async (req, res) => {
-    console.log('Received request body:', req.body);
+        console.log('Received request body:', req.body);
 
-    const newUser = new Players({
-        name: req.body.UserName,
-        wins: 0,
-        losses: 0,
-        totalGuess: 0
+        const newUser = new Players({
+            name: req.body.UserName,
+            wins: 0,
+            losses: 0,
+            totalGuess: 0
+        });
+
+        await newUser.save();
+        res.send("New User added!");
     });
-
-    await newUser.save();
-    res.send("New User added!");
-})
 
 app.get('/games',async (req, res) => {
-    try {
-        const games = await Games.find().populate(['players']);
-        
-        res.json(games);
-      } catch (error) {
-        console.error('error getting games:', error);
-        res.status(500).json({ error: 'Error' });
-      }
+        try {
+            const games = await Games.find().populate(['players']);
+            
+            res.json(games);
+        } catch (error) {
+            console.error('error getting games:', error);
+            res.status(500).json({ error: 'Error' });
+        }
     });
-
-
-
-});
