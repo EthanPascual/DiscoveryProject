@@ -84,15 +84,17 @@ function App() {
 
 
   return user ? (
-    <GameProvider>
+    
       <Router>
+        <GameProvider>
         <Routes>
           <Route path="/" element={<Homepage user={user} words={wordList}/> } />
           <Route path="/gameroom" element={<GameRoom  user = {user} />} />
           <Route path="/stats" element={<Stats user={user} />} />
         </Routes>
+        </GameProvider>
+       
       </Router>
-    </GameProvider>
   ) : (
       <div>Loading...</div>
   );
