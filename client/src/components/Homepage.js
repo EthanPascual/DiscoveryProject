@@ -40,27 +40,21 @@ export default function Homepage({user}){
             setChooseWord(false);
             goToGameRoom();
         });
-        socket.on('message', (message) => {
-            if (message === 'Game Start') {
-                console.log('Game started!'); 
-                setShowModal(false);
-                setGameFound(true);
-                setTimeout(() => {
-                    navigate('/gameroom');
-                }, 5000); // 5 seconds timeout
-                
-            }
+        socket.on('gameStart', ({ starts }) => {
+            console.log('Game started! First turn:', starts); 
+            setShowModal(false);
+            setGameFound(true);
+            setTimeout(() => {
+                navigate('/gameroom');
+            }, 5000); // 5 seconds timeout
         });
 
         return () => {
             socket.off('createdMessage');
-            socket.off('Game Start');
+            socket.off('gameStart');
         };
 
     }, []);
-
-
-    
 
     return(
         <>

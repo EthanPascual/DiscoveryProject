@@ -43,15 +43,21 @@ io.on('connection', (socket) => {
     socket.on('findGame', () => {
         console.log("finding game");
         if (waitingPlayer != null) {
-            console.log("Current waiting that you are matched with: " + waitingPlayer.id)
+            console.log("You are matched with: " + waitingPlayer.id)
+            
             const roomID = waitingPlayer.id + '#' + socket.id;
-            gameRooms.set(roomID, [waitingPlayer, socket]);
+            const starts = Math.random() < 0.5 ? waitingPlayer.id : socket.id;
+
+            gameRooms.set(roomID, { players: [waitingPlayer, socket], turn: starts });
             waitingPlayer.join(roomID);
             socket.join(roomID);
+
+            io.to(roomID).emit('gameStart', { starts });
+            io.to(roomID).emit('turn', { turn: starts });
+
             waitingPlayer = null;
-            io.to(roomID).emit('message', 'Game Start');
         } else {
-            console.log("You are the waiting player")
+            console.log("You are the waiting player" + socket.id)
             waitingPlayer = socket;
             waitingPlayer.emit('message', 'Waiting for an opponent');
         }
@@ -59,15 +65,20 @@ io.on('connection', (socket) => {
     
 
     socket.on('disconnect', () => {
-      console.log('🔥: user ' + socket.id + ' disconnected');
+        console.log('🔥: user ' + socket.id + ' disconnected');
+        let roomToDelete = null;
 
-        for (let [roomID, players] of gameRooms) {
-            if (players.includes(socket)) {
+        gameRooms.forEach((game, roomID) => {
+            if (game.players.some(player => player.id === socket.id)) {
                 socket.to(roomID).emit('message', 'Your opponent has disconnected');
-                gameRooms.delete(roomID);
-                break;
+                roomToDelete = roomID;
             }
+        });
+
+        if (roomToDelete) {
+            gameRooms.delete(roomToDelete);
         }
+
         if (waitingPlayer === socket) {
             waitingPlayer = null;
         }
@@ -85,18 +96,15 @@ io.on('connection', (socket) => {
     });
 
     socket.on('guess', (guess) => {
-        // Find the room the player is in
-        let room;
-        for (let [roomID, players] of gameRooms.entries()) {
-            if (players.includes(socket)) {
-            room = roomID;
-            break;
+        for (let [roomID, game] of gameRooms.entries()) {
+            if (game.players.includes(socket) && game.turn === socket.id) {
+                game.turn = game.players.find(player => player.id !== socket.id).id;
+
+                console.log(game.turn, "turn");
+                io.to(roomID).emit('turn', game.turn);
+                socket.to(roomID).emit('opponentGuess', guess);
+                break;
             }
-        }
-        console.log(room)
-        // If the player is in a room, emit the guess to the other player in the room
-        if (room) {
-            socket.to(room).emit('opponentGuess', guess); // Use a unique event for opponent's guesses
         }
     });
 

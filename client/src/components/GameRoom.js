@@ -17,8 +17,12 @@ export default function GameRoom(props){
   const [gameEnd, setGameEnd] = useState(false);
   const [win, setWin] = useState(false);
   const [guess, setGuess] = useState('');
+  const [currentTurn, setCurrentTurn] = useState('');
+  const [myPlayerId, setMyPlayerId] = useState('');
+  //const [turn, setTurn] = useState(false);
 
   useEffect(()=>{ // This is used for populating the setGamesList
+    setMyPlayerId(socket.id)
 
     axios.get('http://localhost:8000/games').then(res => {
       setGamesList(res.data)
@@ -45,10 +49,23 @@ export default function GameRoom(props){
 
     socket.on('opponentGuess', opponentGuessListener);
 
+    const turnListener = (turn) => {
+      console.log(`It's now ${turn}'s turn.`);
+      setCurrentTurn(turn);
+      /*if (turn === socket.id) {
+        setTurn(true)
+      } else {
+        setTurn(false)
+      }*/
+    };
+
+    socket.on('turn', turnListener);
+
     return () => {
         socket.off('gameEnd');
         socket.off('message', messageListener);
         socket.off('opponentGuess', opponentGuessListener);
+        socket.off('turn', turnListener);
     }
   }, [])
 
@@ -63,15 +80,17 @@ export default function GameRoom(props){
 
   const handleKeyPressGuess = (event) => {
     if (event.key == 'Enter') {
+
+      console.log("your id",myPlayerId);
       tryGuessWord();
     }
   }
 
   const tryGuessWord = () => {
-      console.log('guessing: ' + guess);
-      setYourGuessLog([...yourGuessLog, guess]);
-      socket.emit('guess', guess);
-      setGuess('');
+    console.log('guessing: ' + guess);
+    setYourGuessLog([...yourGuessLog, guess]);
+    socket.emit('guess', guess);
+    setGuess('');
   }
 
   const winning = () => {
@@ -113,6 +132,7 @@ export default function GameRoom(props){
           </div>
         </div>
         <div className="inputArea">
+          <p>{currentTurn === myPlayerId ? "Your" : "Enemy's"} turn</p>
           <label htmlFor="current-guess">input current guess:</label>
           <input
             type="text"
