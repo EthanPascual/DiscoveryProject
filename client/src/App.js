@@ -29,7 +29,6 @@ function App() {
 
   useEffect(() => {
     const setCookieIfNewUser = async () => {
-      if (!cookies.user) {
         try {
           if (wordList.length === 0) {
             const response = await fetch('/words.json');
@@ -40,31 +39,34 @@ function App() {
             const wordList = jsonData.list;
             setWordsList(wordList);
           }
-
-          if (wordList.length > 0) { 
-            let uniqueName = false;
-            let randomName;
-
-            while(!uniqueName){
-              randomName = getRandomName();
-              if(userList.includes(randomName)){
-
-              }
-              else{
-                uniqueName = true;
-              }
-            }
-            
-            setCookie("user", randomName, { path: "/" });
-  
-            await axios.post('http://localhost:8000/newUsers', {
-              UserName: randomName
-            });
+          }  catch (error) {
+            console.error('Error setting cookie:', error);
           }
-        } catch (error) {
-          console.error('Error setting cookie:', error);
-        }
-      }
+          if(!cookies.user){
+            if (wordList.length > 0) { 
+              let uniqueName = false;
+              let randomName;
+  
+              while(!uniqueName){
+                randomName = getRandomName();
+                if(userList.includes(randomName)){
+  
+                }
+                else{
+                  uniqueName = true;
+                }
+              }
+              
+              setCookie("user", randomName, { path: "/" });
+    
+              await axios.post('http://localhost:8000/newUsers', {
+                UserName: randomName
+              });
+            }
+        
+          }
+          
+      
     };
 
     setCookieIfNewUser();

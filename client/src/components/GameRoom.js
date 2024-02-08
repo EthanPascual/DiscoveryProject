@@ -29,7 +29,9 @@ export default function GameRoom({user}){
         console.log(gameEnd);
       });
 
-      
+      socket.on('gameInfo', () => {
+        console.log('PLEASE FUCKING WORK');
+      });
 
   
     return () => {
@@ -40,6 +42,11 @@ export default function GameRoom({user}){
 
 
     }, [])
+
+    useEffect(() => {
+      console.log('The game has started');
+      socket.emit('gameStart');
+    }, []);
 
     const handleKeyPress = (event) => {
       if(event.key == 'Enter'){
