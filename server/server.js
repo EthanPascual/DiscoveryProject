@@ -42,11 +42,15 @@ io.on('connection', (socket) => {
         if (waitingPlayer != null) {
             console.log("Current waiting that you are matched with: " + waitingPlayer.id)
             const roomID = waitingPlayer.id + '#' + socket.id;
-            gameRooms.set(roomID, [waitingPlayer, socket]);
-            waitingPlayer.join(roomID);
-            socket.join(roomID);
+            const firstPlayer = Math.random() < 0.5 ? waitingPlayer : socket;
+            const secondPlayer = firstPlayer === socket ? waitingPlayer : socket;
+            gameRooms.set(roomID, { players: [firstPlayer, secondPlayer], turn: firstPlayer.id });
+            firstPlayer.join(roomID);
+            secondPlayer.join(roomID);
             waitingPlayer = null;
             io.to(roomID).emit('message', 'Game Start');
+            io.to(roomID).emit('turn', firstPlayer.id);
+            console.log(firstPlayer.id)
         } else {
             console.log("You are the waiting player")
             waitingPlayer = socket;
