@@ -15,7 +15,10 @@ let db = mongoose.connection;
 
 const port = 8000;
 
+app.use(cors());
+
 app.use(express.json());
+
 //SOCKET IO STUFF HERE
 const server = createServer(app);
 const io = new Server(server, {
@@ -43,18 +46,16 @@ io.on('connection', (socket) => {
         console.log(userParam); // user object
         console.log("finding game");
         if (waitingPlayer != null) {
-            console.log("Current waiting that you are matched with: " + waitingPlayer.id)
+            console.log("You are matched with: " + waitingPlayer.id)
+            
             const roomID = waitingPlayer.id + '#' + socket.id;
-            gameRooms.set(roomID, [waitingPlayer, socket]);
+            const starts = Math.random() < 0.5 ? waitingPlayer.id : socket.id;
+
+            gameRooms.set(roomID, { players: [waitingPlayer, socket], turn: starts });
             waitingPlayer.join(roomID);
             socket.join(roomID);
-            axios.post("http://localhost:8000/newGames",{
-                name1: userParam,
-                name2: player2
-            })
-            waitingPlayer = null;   
+            waitingPlayer = null;
             io.to(roomID).emit('message', 'Game Start');
-
         } else {
 
             console.log("You are the waiting player")
@@ -67,14 +68,19 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('🔥: user ' + socket.id + ' disconnected');
+        let roomToDelete = null;
 
-        for (let [roomID, players] of gameRooms) {
-            if (players.includes(socket)) {
+        gameRooms.forEach((game, roomID) => {
+            if (game.players.some(player => player.id === socket.id)) {
                 socket.to(roomID).emit('message', 'Your opponent has disconnected');
-                gameRooms.delete(roomID);
-                break;
+                roomToDelete = roomID;
             }
+        });
+
+        if (roomToDelete) {
+            gameRooms.delete(roomToDelete);
         }
+
         if (waitingPlayer === socket) {
             waitingPlayer = null;
         }
@@ -86,6 +92,29 @@ io.on('connection', (socket) => {
         for (let [roomID, players] of gameRooms) {
             if (players.includes(socket)) {
                 socket.to(roomID).emit('message', message);
+                break;
+            }
+        }
+    });
+
+    socket.on('guess', (guess) => {
+        for (let [roomID, game] of gameRooms.entries()) {
+            if (game.players.includes(socket) && game.turn === socket.id) {
+                game.turn = game.players.find(player => player.id !== socket.id).id;
+
+                console.log(game.turn, "turn");
+                io.to(roomID).emit('turn', game.turn);
+                socket.to(roomID).emit('opponentGuess', guess);
+                break;
+            }
+        }
+    });
+
+    socket.on('count', (data) => {
+        console.log(`Count received: ${data}`);
+        for (let [key, game] of gameRooms.entries()) {
+            if (game.players.includes(socket)) {
+                socket.to(key).emit('count', data);
                 break;
             }
         }
@@ -119,7 +148,7 @@ io.on('connection', (socket) => {
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.on('connected', function () {
     console.log("connected to database")
-    app.use(cors())
+});
 
     app.get('/users', async (req, res) => {
         let users = await Players.find();
@@ -136,9 +165,15 @@ db.on('connected', function () {
 
     });
 
-    app.post('/newUsers', async (req, res) => {
-        console.log('Received request body:', req.body);
+app.post('/newUsers', async (req, res) => {
+    console.log('Received request body:', req.body);
 
+        const newUser = new Players({
+            name: req.body.UserName,
+            wins: 0,
+            losses: 0,
+            totalGuess: 0
+        });
         const newUser = new Players({
             name: req.body.UserName,
             wins: 0,
@@ -181,7 +216,3 @@ db.on('connected', function () {
             res.status(500).json({ error: 'Error' });
         }
     });
-
-
-
-});

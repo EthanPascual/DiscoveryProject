@@ -7,6 +7,7 @@ import {socket} from '../App';
 import WaitingRoom from "./WaitingRoom.js"
 import Countdown from './Countdown.js'
 import ChooseWordModal from './ChooseWordModal.js'
+import { useGame } from './GameContext';
 import axios from 'axios';
 
 
@@ -17,8 +18,7 @@ export default function Homepage({user, words}){
     const [chooseWord, setChooseWord] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [gameFound, setGameFound] = useState(false);
-    const [chosenWord, setChosenWord] = useState('');
-
+    const { setChosenWord, setCurrentTurn } = useGame();
 
     const goToGameRoom = () => {
         setShowModal(true)
@@ -33,7 +33,7 @@ export default function Homepage({user, words}){
 
     const pickWord = () => {
         setChooseWord(true);
-        console.log("picking word")
+        //console.log("picking word")
     }
 
     useEffect(() => {
@@ -45,24 +45,24 @@ export default function Homepage({user, words}){
             setChooseWord(false);
             goToGameRoom();
         });
-        socket.on('message', (message) => {
-            if (message === 'Game Start') {
-                console.log('Game started!'); 
-                setShowModal(false);
-                setGameFound(true);
-                setTimeout(() => {
-                    navigate('/gameroom');
-                }, 5000); // 5 seconds timeout
-                
-            }
+        socket.on('gameStart', ({ starts }) => {
+            console.log('Game started! First turn:', starts); 
+            setCurrentTurn(starts);
+            setShowModal(false);
+            setGameFound(true);
+            setTimeout(() => {
+                navigate('/gameroom');
+            }, 5000); // 5 seconds timeout
         });
 
         return () => {
             socket.off('createdMessage');
-            socket.off('Game Start');
+            socket.off('gameStart');
         };
 
     }, []);
+
+
     
 
     return(

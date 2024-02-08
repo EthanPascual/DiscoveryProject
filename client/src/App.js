@@ -7,9 +7,8 @@ import Stats from "./components/Stats"
 import { CookiesProvider, useCookies} from 'react-cookie';
 import axios from "axios";
 import { io } from 'socket.io-client';
+import { GameProvider } from './components/GameContext'
 export const socket = io('http://localhost:8000');
-
-
 
 function App() {
 
@@ -83,14 +82,15 @@ function App() {
 
 
   return user ? (
-    <Router>
-
-        <Route path="/" element={<Homepage user={user} words={wordList}/> } />
-
-        <Route path="/gameroom" element={<GameRoom />} />
-        <Route path="/stats" element={<Stats user={user} />} />
-      </Routes>
-    </Router>
+    <GameProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Homepage user={user} words={wordList}/> } />
+          <Route path="/gameroom" element={<GameRoom />} />
+          <Route path="/stats" element={<Stats user={user} />} />
+        </Routes>
+      </Router>
+    </GameProvider>
   ) : (
       <div>Loading...</div>
   );
