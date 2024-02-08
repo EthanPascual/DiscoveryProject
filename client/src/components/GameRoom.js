@@ -50,6 +50,10 @@ export default function GameRoom({ user, words }) {
     const countListener = (count) => {
       console.log("HERE " + count)
       setYourGuessLog((yourGuessLog) => [...yourGuessLog, `${count}`]);
+      if(count.charAt(6) === '5'){
+        console.log("Winner detected");
+        winning()
+      }
     }
 
     socket.on('gameEnd', () => {
