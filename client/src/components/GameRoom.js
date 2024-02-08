@@ -29,16 +29,11 @@ export default function GameRoom(props){
         console.log(gameEnd);
       });
 
-      socket.on('turn', (playerID) => {
-        console.log("in here")
-        setTurn(playerID === socket.id);
-        console.log(`It's ${playerID === socket.id ? 'your' : 'opponent'} turn.`);
-      });
+      
 
   
     return () => {
         socket.off('gameEnd');
-        socket.off('turn')
     }
 
     }, [])
