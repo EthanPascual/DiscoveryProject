@@ -102,6 +102,11 @@ io.on('connection', (socket) => {
         socket.emit('createdMessage', word);
     })
 
+    socket.on('gameStart', () => {
+        console.log('server received game start');
+        socket.emit('gameInfo');
+    });
+
   });
 
 
