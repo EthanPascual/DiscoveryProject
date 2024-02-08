@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import axios from "axios";
 import io from "socket.io-client";
-import {socket} from "../App";
+import { socket } from "../App";
 import GameEndModal from './GameEndModal';
 import { useGame } from './GameContext';
 
 
-export default function GameRoom({user}){
+export default function GameRoom({ user, words }) {
 
   //const [gameList, setGamesList] = useState([]);
   const [message, setMessage] = useState('');
@@ -18,9 +18,10 @@ export default function GameRoom({user}){
   const [win, setWin] = useState(false);
   const [guess, setGuess] = useState('');
   const [myPlayerId, setMyPlayerId] = useState('');
+  const [validWord, setValidWord] = useState(false);
   const { chosenWord, currentTurn, setCurrentTurn } = useGame();
 
-  useEffect(()=>{ // This is used for populating the setGamesList
+  useEffect(() => { // This is used for populating the setGamesList
     setMyPlayerId(socket.id)
 
     /*axios.get('http://localhost:8000/games').then(res => {
@@ -38,7 +39,7 @@ export default function GameRoom({user}){
       const count = countMatchingLetters(guess);
       console.log(count)
       setEnemyGuessLog((enemyGuessLog) => [...enemyGuessLog, `${guess} ${count}`]);
-      socket.emit('count', guess+" "+count);
+      socket.emit('count', guess + " " + count);
     };
 
     const turnListener = (turn) => {
@@ -61,26 +62,26 @@ export default function GameRoom({user}){
     socket.on('count', countListener);
 
     return () => {
-        socket.off('gameEnd');
-        socket.off('message', messageListener);
-        socket.off('opponentGuess', opponentGuessListener);
-        socket.off('turn', turnListener);
-        socket.off('count', countListener);
+      socket.off('gameEnd');
+      socket.off('message', messageListener);
+      socket.off('opponentGuess', opponentGuessListener);
+      socket.off('turn', turnListener);
+      socket.off('count', countListener);
     }
 
-    
 
 
-    }, [])
 
-    useEffect(() => {
-      console.log('The game has started');
-      socket.emit('gameStart');
-    }, []);
+  }, [])
+
+  useEffect(() => {
+    console.log('The game has started');
+    socket.emit('gameStart');
+  }, []);
 
 
   const handleKeyPressChat = (event) => {
-    if(event.key == 'Enter'){
+    if (event.key == 'Enter') {
       console.log('sending message: ' + message);
       setChatlog([...chatLog, 'me: ' + message]);
       socket.emit('message', message.toString());
@@ -100,10 +101,23 @@ export default function GameRoom({user}){
   }
 
   const tryGuessWord = () => {
-    console.log('guessing: ' + guess);
+
     //setYourGuessLog([...yourGuessLog, guess]);
-    socket.emit('guess', guess);
-    setGuess('');
+    if (words.indexOf(guess) !== -1) {
+      
+      console.log('guessing: ' + guess);
+      socket.emit('guess', guess);
+      setGuess('');
+      setValidWord(false);
+    }
+    else {
+      console.log("Invalid Word!");
+
+      setValidWord(true);
+
+
+    }
+
   }
 
   const countMatchingLetters = (guess) => {
@@ -120,82 +134,89 @@ export default function GameRoom({user}){
     return matchCount;
   };
 
-    const winning = () => {
-      console.log('You Win!!');
-      socket.emit('gameEnd', user);
-      setWin(true)
-      setGameEnd(true)
-      console.log(gameEnd)
-    }
+  const winning = () => {
+    console.log('You Win!!');
+    socket.emit('gameEnd', user);
+    setWin(true)
+    setGameEnd(true)
+    console.log(gameEnd)
+  }
 
   const handleInputChange = (e) => {
+
     setMessage(e.target.value);
+
   }
 
   const handleGuessChange = (e) => {
+
+
     setGuess(e.target.value);
+
+
   }
 
   socket.on('message', (message) => {
-      setChatlog([...chatLog, 'player 2: ' + message]);
-      console.log('📩: message received: ' + message);
+    setChatlog([...chatLog, 'player 2: ' + message]);
+    console.log('📩: message received: ' + message);
   });
 
 
 
   return (
     <>
-    {gameEnd && <GameEndModal win={win} />}
-    <div className='container'>
-      <div className="gameContainer">
-    <h1>{chosenWord}</h1>
-        <div className="guessesContainer">
-          <div className="yourGuesses">
-            <h2>Your guesses</h2>
-            <ul>
-              {yourGuessLog.map((guess, index) => (
-                <li key={index}>{guess}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="enemyGuesses">
-            <h2>Enemy guesses</h2>
-            <ul>
-              {enemyGuessLog.map((guess, index) => (
-                <li key={index}>{guess}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        <div className="inputArea">
-          <p>{currentTurn === myPlayerId ? "Your" : "Enemy's"} turn</p>
-          <label htmlFor="current-guess">input current guess:</label>
-          <input
-            type="text"
-            id="current-guess"
-            name="current-guess"
-            maxLength="5"
-            value={guess}
-            onChange={handleGuessChange}
-            onKeyDown={handleKeyPressGuess}
-          />
-          <button onClick={tryGuessWord}>Submit Guess</button>
-        </div>
-        <div className="notesArea">
-          <textarea placeholder="*text area for notes about the game*"></textarea>
-        </div>
-        <button onClick={winning}>Click to Simulate Win</button>
-      </div>
-      <div className = "chatRoom">
-        <input type='text' id='chatInput' onKeyDown={handleKeyPressChat} onChange={handleInputChange} placeholder='Chat with your opponent...' value={message}/>
+      {gameEnd && <GameEndModal win={win} />}
+      <div className='container'>
+        <div className="gameContainer">
+          <h1>{chosenWord}</h1>
+          <div className="guessesContainer">
+            <div className="yourGuesses">
+              <h2>Your guesses</h2>
               <ul>
-                  {chatLog.map((message, index) => (
-                  <li key={index}>{message}</li>
-                  ))}
+                {yourGuessLog.map((guess, index) => (
+                  <li key={index}>{guess}</li>
+                ))}
               </ul>
-      </div>
+            </div>
+            <div className="enemyGuesses">
+              <h2>Enemy guesses</h2>
+              <ul>
+                {enemyGuessLog.map((guess, index) => (
+                  <li key={index}>{guess}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="inputArea">
+            <p>{currentTurn === myPlayerId ? "Your" : "Enemy's"} turn</p>
+            <label htmlFor="current-guess">input current guess:</label>
+            {validWord && <p>Your word is not valid</p>}
+            <input
+              type="text"
+              id="current-guess"
+              name="current-guess"
+              maxLength="5"
+              value={guess}
+              onChange={handleGuessChange}
+              onKeyDown={handleKeyPressGuess}
+            />
+            <button onClick={tryGuessWord}>Submit Guess</button>
+          </div>
+          <div className="notesArea">
+            <textarea placeholder="*text area for notes about the game*"></textarea>
+          </div>
+          <button onClick={winning}>Click to Simulate Win</button>
+        </div>
+        <div className="chatRoom">
+          <input type='text' id='chatInput' onKeyDown={handleKeyPressChat} onChange={handleInputChange} placeholder='Chat with your opponent...' value={message} />
+          <ul>
+            {chatLog.map((message, index) => (
+              <li key={index}>{message}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     </>
   );
 
-                  }
+}
