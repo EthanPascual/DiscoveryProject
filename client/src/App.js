@@ -89,7 +89,7 @@ function App() {
         <GameProvider>
         <Routes>
           <Route path="/" element={<Homepage user={user} words={wordList}/> } />
-          <Route path="/gameroom" element={<GameRoom  user = {user} />} />
+          <Route path="/gameroom" element={<GameRoom  user = {user} words = {wordList}/>} />
           <Route path="/stats" element={<Stats user={user} />} />
         </Routes>
         </GameProvider>
