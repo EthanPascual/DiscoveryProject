@@ -62,11 +62,12 @@ export default function Stats(props) {
             switch (sortHourName){
 
                 case 'default':
-                    sorted = [...sortedHourGames].sort((a,b) => a.players[0].name.localeCompare(b.players[0].name));
+                    console.log("hi");
+                    sorted = [...sortedHourGames].sort((a,b) => userList.find((user) => (user._id === a.players[0])).name.localeCompare(userList.find((user) => (user._id === b.players[0])).name));
                     setHourNameOrder("alphabetical");
                     break;
                 case 'alphabetical':
-                    sorted = [...sortedHourGames].sort((a,b) => b.players[0].name.localeCompare(a.players[0].name));
+                    sorted = [...sortedHourGames].sort((a,b) => userList.find((user) => (user._id === b.players[0])).name.localeCompare(userList.find((user) => (user._id === a.players[0])).name));
                     setHourNameOrder("reverse");
                     break;
                 case 'reverse':
@@ -79,7 +80,7 @@ export default function Stats(props) {
                 
             }
 
-            setSortedGames(sorted);
+            setHourGames(sorted);
 
         }
 
@@ -87,11 +88,11 @@ export default function Stats(props) {
 
             switch (sortHourName2){
                 case 'default':
-                    sorted = [...sortedHourGames].sort((a,b) => a.players[1].name.localeCompare(b.players[1].name));
+                    sorted = [...sortedHourGames].sort((a,b) => userList.find((user) => (user._id === a.players[1])).name.localeCompare(userList.find((user) => (user._id === b.players[1])).name));
                     setHourNameOrder2("alphabetical");
                     break;
                 case 'alphabetical':
-                    sorted = [...sortedHourGames].sort((a,b) => b.players[1].name.localeCompare(a.players[1].name));
+                    sorted = [...sortedHourGames].sort((a,b) => userList.find((user) => (user._id === b.players[1])).name.localeCompare(userList.find((user) => (user._id === a.players[1])).name));
                     setHourNameOrder2("reverse");
                     break;
                 case 'reverse':
@@ -104,7 +105,7 @@ export default function Stats(props) {
                 
             }
 
-            setSortedGames(sorted);
+            setHourGames(sorted);
 
         }
 
@@ -112,11 +113,19 @@ export default function Stats(props) {
 
             switch (sortHourWinner){
                 case 'default':
-                    sorted = [...sortedHourGames].sort((a,b) => a.winner.name.localeCompare(b.winner.name));
+                    sorted = [...sortedHourGames].sort((a, b) => {
+                        if (!a.winner || !b.winner) return 1; 
+
+                        return userList.find(user => user._id === a.winner).name.localeCompare(userList.find(user => user._id === b.winner).name);
+                    });
                     setHourWinner("alphabetical");
                     break;
                 case 'alphabetical':
-                    sorted = [...sortedHourGames].sort((a,b) => b.winner.name.localeCompare(a.winner.name));
+                    sorted = [...sortedHourGames].sort((a, b) => {
+                        if (!a.winner || !b.winner) return 1; 
+
+                        return userList.find(user => user._id === b.winner).name.localeCompare(userList.find(user => user._id === a.winner).name);
+                    });
                     setHourWinner("reverse");
                     break;
                 case 'reverse':
@@ -129,7 +138,7 @@ export default function Stats(props) {
                 
             }
 
-            setSortedGames(sorted);
+            setHourGames(sorted);
 
         }
 
@@ -137,12 +146,20 @@ export default function Stats(props) {
 
             switch (sortHourLoser){
                 case 'default':
-                    sorted = [...sortedHourGames].sort((a,b) => a.loser.name.localeCompare(b.loser.name));
-                    setHourLoser('alphabetical');
+                    sorted = [...sortedHourGames].sort((a, b) => {
+                        if (!a.winner || !b.winner) return 1; 
+
+                        return userList.find(user => user._id === a.loser).name.localeCompare(userList.find(user => user._id === b.loser).name);
+                    });
+                    setHourLoser("alphabetical");
                     break;
                 case 'alphabetical':
-                    sorted = [...sortedHourGames].sort((a,b) => b.loser.name.localeCompare(a.loser.name));
-                    setHourLoser('reverse');
+                    sorted = [...sortedHourGames].sort((a, b) => {
+                        if (!a.winner || !b.winner) return 1; 
+
+                        return userList.find(user => user._id === b.loser).name.localeCompare(userList.find(user => user._id === a.loser).name);
+                    });
+                    setHourLoser("reverse");
                     break;
                 case 'reverse':
                     sorted = sortedHourGames;
@@ -154,7 +171,7 @@ export default function Stats(props) {
                 
             }
 
-            setSortedGames(sorted);
+            setHourGames(sorted);
 
         }
 
@@ -165,21 +182,22 @@ export default function Stats(props) {
         let sorted;
 
         if(param == 'Name1'){
-
+            console.log(gameList);
             switch (sortAllTimeName){
 
                 case 'default':
-                    sorted = [...gameList].sort((a,b) => a.players[0].name.localeCompare(b.players[0].name));
+                    sorted = [...gameList].sort((a,b) => userList.find((user) => (user._id === a.players[0])).name.localeCompare(userList.find((user) => (user._id === b.players[0])).name));
                     setAllTimeNameOrder("alphabetical");
                     break;
                 case 'alphabetical':
-                    sorted = [...gameList].sort((a,b) => b.players[0].name.localeCompare(a.players[0].name));
+                    sorted = [...gameList].sort((a,b) => userList.find((user) => (user._id === b.players[0])).name.localeCompare(userList.find((user) => (user._id === a.players[0])).name));
                     setAllTimeNameOrder("reverse");
                     break;
                 case 'reverse':
                     sorted = gameList;
                     setAllTimeNameOrder('default');
                     break;
+
                 default:
                     sorted = gameList;
                 
@@ -194,11 +212,11 @@ export default function Stats(props) {
 
             switch (sortAllTimeName2){
                 case 'default':
-                    sorted = [...gameList].sort((a,b) => a.players[1].name.localeCompare(b.players[1].name));
+                    sorted = [...gameList].sort((a,b) => userList.find((user) => (user._id === a.players[1])).name.localeCompare(userList.find((user) => (user._id === b.players[1])).name));
                     setAllTimeNameOrder2("alphabetical");
                     break;
                 case 'alphabetical':
-                    sorted = [...gameList].sort((a,b) => b.players[1].name.localeCompare(a.players[1].name));
+                    sorted = [...gameList].sort((a,b) => userList.find((user) => (user._id === b.players[1])).name.localeCompare(userList.find((user) => (user._id === a.players[1])).name));
                     setAllTimeNameOrder2("reverse");
                     break;
                 case 'reverse':
@@ -219,11 +237,19 @@ export default function Stats(props) {
 
             switch (sortAllTimeWinner){
                 case 'default':
-                    sorted = [...gameList].sort((a,b) => a.winner.name.localeCompare(b.winner.name));
+                    sorted = [...gameList].sort((a, b) => {
+                        if (!a.winner || !b.winner) return 1; 
+
+                        return userList.find(user => user._id === a.winner).name.localeCompare(userList.find(user => user._id === b.winner).name);
+                    });
                     setAllTimeWinner("alphabetical");
                     break;
                 case 'alphabetical':
-                    sorted = [...gameList].sort((a,b) => b.winner.name.localeCompare(a.winner.name));
+                    sorted = [...gameList].sort((a, b) => {
+                        if (!a.winner || !b.winner) return 1; 
+
+                        return userList.find(user => user._id === b.winner).name.localeCompare(userList.find(user => user._id === a.winner).name);
+                    });
                     setAllTimeWinner("reverse");
                     break;
                 case 'reverse':
@@ -244,11 +270,19 @@ export default function Stats(props) {
 
             switch (sortAllTimeLoser){
                 case 'default':
-                    sorted = [...gameList].sort((a,b) => a.loser.name.localeCompare(b.loser.name));
+                    sorted = [...gameList].sort((a, b) => {
+                        if (!a.loser || !b.loser) return 1; 
+                        
+                        return userList.find(user => user._id === a.loser).name.localeCompare(userList.find(user => user._id === b.loser).name);
+                    });
                     setAllTimeLoser('alphabetical');
                     break;
                 case 'alphabetical':
-                    sorted = [...gameList].sort((a,b) => b.loser.name.localeCompare(a.loser.name));
+                    sorted = [...gameList].sort((a, b) => {
+                        if (!a.loser || !b.loser) return 1; 
+                        
+                        return userList.find(user => user._id === a.loser).name.localeCompare(userList.find(user => user._id === b.loser).name);
+                    });
                     setAllTimeLoser('reverse');
                     break;
                 case 'reverse':
