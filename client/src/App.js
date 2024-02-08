@@ -86,13 +86,11 @@ function App() {
 
   return user ? (
     <Router>
-        <Routes>
-          <Route path="/" element={<Homepage user={user} words={wordList}/> } />
-
-          <Route path="/gameroom" element={<GameRoom />} />
-          <Route path="/stats" element={<Stats user={user} />} />
-        </Routes>
-        
+    <Routes>
+        <Route path="/" element={<Homepage user={user} words={wordList}/> } />
+        <Route path="/gameroom" element={<GameRoom user = {user} />} />
+        <Route path="/stats" element={<Stats user={user} />} />
+      </Routes>
     </Router>
   ) : (
       <div>Loading...</div>

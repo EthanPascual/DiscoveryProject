@@ -7,7 +7,7 @@ import GameEndModal from './GameEndModal';
 
 
 
-export default function GameRoom(props){
+export default function GameRoom({user}){
 
     const [gameList, setGamesList] = useState([]);
     const [message, setMessage] = useState('');
@@ -38,7 +38,7 @@ export default function GameRoom(props){
         socket.off('gameEnd');
     }
 
-    
+
 
 
     }, [])
@@ -59,7 +59,7 @@ export default function GameRoom(props){
 
     const winning = () => {
       console.log('You Win!!');
-      socket.emit('gameEnd');
+      socket.emit('gameEnd', user);
       setWin(true)
       setGameEnd(true)
       console.log(gameEnd)
