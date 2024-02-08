@@ -47,7 +47,8 @@ export default function GameRoom({user}){
     };
 
     const countListener = (count) => {
-      setYourGuessLog([...yourGuessLog, `${count}`]);
+      console.log("HERE " + count)
+      setYourGuessLog((yourGuessLog) => [...yourGuessLog, `${count}`]);
     }
 
     socket.on('gameEnd', () => {
