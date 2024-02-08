@@ -142,13 +142,13 @@ io.on('connection', (socket) => {
         console.log("The Game has Ended");
         console.log(winningUser);
         for (let [roomID, players] of gameRooms) {
-            if (players.includes(socket)) {
+            if (players.players.includes(socket)) {
                 axios.put(`http://localhost:8000/updateGame`, {
                     winner: winningUser
                 });
                 socket.to(roomID).emit('gameEnd');
                 socket.leave(roomID);
-                const otherPlayerSocket = players.find(playerSocket => playerSocket !== socket);
+                const otherPlayerSocket = players.players.find(playerSocket => playerSocket !== socket);
                 otherPlayerSocket.leave(roomID);
 
                 gameRooms.delete(roomID);
