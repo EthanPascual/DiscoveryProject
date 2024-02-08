@@ -37,7 +37,7 @@ export default function Homepage({user, words}){
     }
 
     useEffect(() => {
-
+        console.log(words);
 
         socket.on('createdMessage', (word) => {
             console.log("word was found");
