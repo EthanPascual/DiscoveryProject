@@ -4,12 +4,11 @@ import axios from "axios";
 import io from "socket.io-client";
 import {socket} from "../App";
 import GameEndModal from './GameEndModal';
-
-
+import { useGame } from './GameContext';
 
 export default function GameRoom(props){
 
-  const [gameList, setGamesList] = useState([]);
+  //const [gameList, setGamesList] = useState([]);
   const [message, setMessage] = useState('');
   const [chatLog, setChatlog] = useState([]);
   const [yourGuessLog, setYourGuessLog] = useState([]);
@@ -17,55 +16,55 @@ export default function GameRoom(props){
   const [gameEnd, setGameEnd] = useState(false);
   const [win, setWin] = useState(false);
   const [guess, setGuess] = useState('');
-  const [currentTurn, setCurrentTurn] = useState('');
   const [myPlayerId, setMyPlayerId] = useState('');
-  //const [turn, setTurn] = useState(false);
+  const { chosenWord, currentTurn, setCurrentTurn } = useGame();
 
   useEffect(()=>{ // This is used for populating the setGamesList
     setMyPlayerId(socket.id)
 
-    axios.get('http://localhost:8000/games').then(res => {
+    /*axios.get('http://localhost:8000/games').then(res => {
       setGamesList(res.data)
-      console.log(gameList)
-    });
-
-    socket.on('gameEnd', () => {
-      console.log('You Lost :(')
-      setGameEnd(true);
-      console.log(gameEnd);
-    });
+      //console.log(gameList)
+    });*/
 
     const messageListener = (message) => {
       setChatlog((chatLog) => [...chatLog, 'player 2: ' + message]);
       console.log('message received: ' + message);
     };
 
-    socket.on('message', messageListener);
-
     const opponentGuessListener = (guess) => {
       console.log('Opponent guessed: ' + guess);
-      setEnemyGuessLog((enemyGuessLog) => [...enemyGuessLog, guess]);
+      const count = countMatchingLetters(guess);
+      console.log(count)
+      setEnemyGuessLog((enemyGuessLog) => [...enemyGuessLog, `${guess} ${count}`]);
+      socket.emit('count', guess+" "+count);
     };
-
-    socket.on('opponentGuess', opponentGuessListener);
 
     const turnListener = (turn) => {
       console.log(`It's now ${turn}'s turn.`);
       setCurrentTurn(turn);
-      /*if (turn === socket.id) {
-        setTurn(true)
-      } else {
-        setTurn(false)
-      }*/
     };
 
+    const countListener = (count) => {
+      setYourGuessLog([...yourGuessLog, `${count}`]);
+    }
+
+    socket.on('gameEnd', () => {
+      console.log('You Lost :(')
+      setGameEnd(true);
+      console.log(gameEnd);
+    });
+    socket.on('message', messageListener);
+    socket.on('opponentGuess', opponentGuessListener);
     socket.on('turn', turnListener);
+    socket.on('count', countListener);
 
     return () => {
         socket.off('gameEnd');
         socket.off('message', messageListener);
         socket.off('opponentGuess', opponentGuessListener);
         socket.off('turn', turnListener);
+        socket.off('count', countListener);
     }
   }, [])
 
@@ -79,10 +78,8 @@ export default function GameRoom(props){
   }
 
   const handleKeyPressGuess = (event) => {
-      //console.log("your id: ",myPlayerId);
     if (event.key == 'Enter') {
-      //tryGuessWord();
-      console.log('handling enter press')
+      //console.log('handling enter press')
       console.log(myPlayerId);
       console.log(currentTurn);
       if (myPlayerId === currentTurn) {
@@ -93,10 +90,24 @@ export default function GameRoom(props){
 
   const tryGuessWord = () => {
     console.log('guessing: ' + guess);
-    setYourGuessLog([...yourGuessLog, guess]);
+    //setYourGuessLog([...yourGuessLog, guess]);
     socket.emit('guess', guess);
     setGuess('');
   }
+
+  const countMatchingLetters = (guess) => {
+    const chosenWordSet = new Set(chosenWord);
+    let matchCount = 0;
+    const guessSet = new Set(guess);
+
+    guessSet.forEach(char => {
+      if (chosenWordSet.has(char)) {
+        matchCount += 1;
+      }
+    });
+
+    return matchCount;
+  };
 
   const winning = () => {
     console.log('You Win!!');
@@ -126,6 +137,7 @@ export default function GameRoom(props){
     {gameEnd && <GameEndModal win={win} />}
     <div className='container'>
       <div className="gameContainer">
+    <h1>{chosenWord}</h1>
         <div className="guessesContainer">
           <div className="yourGuesses">
             <h2>Your guesses</h2>

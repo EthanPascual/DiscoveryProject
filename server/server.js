@@ -108,6 +108,16 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('count', (data) => {
+        console.log(`Count received: ${data}`);
+        for (let [key, game] of gameRooms.entries()) {
+            if (game.players.includes(socket)) {
+                socket.to(key).emit('count', data);
+                break;
+            }
+        }
+    });
+
     socket.on('gameEnd', () => { //ending the game for everyone
         console.log("The Game has Ended");
         for (let [roomID, players] of gameRooms) {

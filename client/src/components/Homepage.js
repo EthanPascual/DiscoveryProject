@@ -7,6 +7,7 @@ import {socket} from '../App';
 import WaitingRoom from "./WaitingRoom.js"
 import Countdown from './Countdown.js'
 import ChooseWordModal from './ChooseWordModal.js'
+import { useGame } from './GameContext';
 
 
 export default function Homepage({user}){
@@ -16,7 +17,7 @@ export default function Homepage({user}){
     const [chooseWord, setChooseWord] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [gameFound, setGameFound] = useState(false);
-    const [chosenWord, setChosenWord] = useState('');
+    const { setChosenWord, setCurrentTurn } = useGame();
 
     const goToGameRoom = () => {
         setShowModal(true)
@@ -42,6 +43,7 @@ export default function Homepage({user}){
         });
         socket.on('gameStart', ({ starts }) => {
             console.log('Game started! First turn:', starts); 
+            setCurrentTurn(starts);
             setShowModal(false);
             setGameFound(true);
             setTimeout(() => {
