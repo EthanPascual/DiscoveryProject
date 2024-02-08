@@ -7,9 +7,10 @@ import {socket} from '../App';
 import WaitingRoom from "./WaitingRoom.js"
 import Countdown from './Countdown.js'
 import ChooseWordModal from './ChooseWordModal.js'
+import axios from 'axios';
 
 
-export default function Homepage({user}){
+export default function Homepage({user, words}){
 
     
     let navigate = useNavigate();
@@ -18,10 +19,12 @@ export default function Homepage({user}){
     const [gameFound, setGameFound] = useState(false);
     const [chosenWord, setChosenWord] = useState('');
 
+
     const goToGameRoom = () => {
         setShowModal(true)
+        console.log(user);
         console.log("showing modal")
-        socket.emit('findGame');
+        socket.emit('findGame', user);
         
     };
     const goToStats = () => {
@@ -34,6 +37,8 @@ export default function Homepage({user}){
     }
 
     useEffect(() => {
+
+
         socket.on('createdMessage', (word) => {
             console.log("word was found");
             setChosenWord(word);
@@ -58,13 +63,11 @@ export default function Homepage({user}){
         };
 
     }, []);
-
-
     
 
     return(
         <>
-            {chooseWord && <ChooseWordModal />}
+            {chooseWord && <ChooseWordModal words={words} />}
             {showModal && <WaitingRoom />}
             {gameFound && <Countdown />}
             <div className="home-container">

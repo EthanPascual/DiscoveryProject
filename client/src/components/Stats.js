@@ -37,7 +37,7 @@ export default function Stats(props) {
 
         });
 
-        axios.get('http://localhost:8000/games').then(res => {
+        axios.get('http://localhost:8000/gamesAllInfo').then(res => {
             setGameList(res.data);
             setSortedGames(res.data);
 

@@ -80,14 +80,19 @@ function App() {
   console.log(user);
   console.log(userList);
 
-  return (
+
+
+  return user ? (
     <Router>
-      <Routes>
-        <Route path="/" element={<Homepage user={user}/> } />
+
+        <Route path="/" element={<Homepage user={user} words={wordList}/> } />
+
         <Route path="/gameroom" element={<GameRoom />} />
-        <Route path="/stats" element={<Stats user={user}/>} />
+        <Route path="/stats" element={<Stats user={user} />} />
       </Routes>
     </Router>
+  ) : (
+      <div>Loading...</div>
   );
 }
 

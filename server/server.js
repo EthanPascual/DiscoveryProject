@@ -3,41 +3,44 @@ const app = express();
 var cors = require('cors');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
+const axios = require('axios');
 
 let Players = require('./models/player.js');
 let Games = require('./models/game.js')
 
 let mongoose = require('mongoose');
-let mongoDb =  "mongodb://127.0.0.1/discovery";
-mongoose.connect(mongoDb, {useNewURLParser: true, useUnifiedTopology: true});
+let mongoDb = "mongodb://127.0.0.1/discovery";
+mongoose.connect(mongoDb, { useNewURLParser: true, useUnifiedTopology: true });
 let db = mongoose.connection;
 
 const port = 8000;
 
 app.use(express.json());
 //SOCKET IO STUFF HERE
-const server = createServer(app); 
-const io = new Server(server,{
+const server = createServer(app);
+const io = new Server(server, {
     cors: {
-      origin: '*',
-      methods: ['GET', 'POST'],
-      credentials: true,
+        origin: '*',
+        methods: ['GET', 'POST'],
+        credentials: true,
     },
-  })
+})
 
 server.listen(port, () => {
 
-    console.log('server running at port: '+ port)
+    console.log('server running at port: ' + port)
 
 });
 
 let gameRooms = new Map();
 let waitingPlayer = null;
+let player2 = null;
 
 io.on('connection', (socket) => {
     console.log('🔥: user ' + socket.id + ' connected');
-  
-    socket.on('findGame', () => {
+
+    socket.on('findGame', (userParam) => {
+        console.log(userParam); // user object
         console.log("finding game");
         if (waitingPlayer != null) {
             console.log("Current waiting that you are matched with: " + waitingPlayer.id)
@@ -45,18 +48,25 @@ io.on('connection', (socket) => {
             gameRooms.set(roomID, [waitingPlayer, socket]);
             waitingPlayer.join(roomID);
             socket.join(roomID);
-            waitingPlayer = null;
+            axios.post("http://localhost:8000/newGames",{
+                name1: userParam,
+                name2: player2
+            })
+            waitingPlayer = null;   
             io.to(roomID).emit('message', 'Game Start');
+
         } else {
+
             console.log("You are the waiting player")
             waitingPlayer = socket;
+            player2 = userParam;
             waitingPlayer.emit('message', 'Waiting for an opponent');
         }
     });
-    
+
 
     socket.on('disconnect', () => {
-      console.log('🔥: user ' + socket.id + ' disconnected');
+        console.log('🔥: user ' + socket.id + ' disconnected');
 
         for (let [roomID, players] of gameRooms) {
             if (players.includes(socket)) {
@@ -102,12 +112,7 @@ io.on('connection', (socket) => {
         socket.emit('createdMessage', word);
     })
 
-    socket.on('gameStart', () => {
-        console.log('server received game start');
-        socket.emit('gameInfo');
-    });
-
-  });
+});
 
 
 
@@ -116,35 +121,65 @@ db.on('connected', function () {
     console.log("connected to database")
     app.use(cors())
 
-app.get('/users',async (req, res) => {
-    let users = await Players.find();
-    
-    res.send(users);
-});
+    app.get('/users', async (req, res) => {
+        let users = await Players.find();
 
-app.post('/newUsers', async (req, res) => {
-    console.log('Received request body:', req.body);
-
-    const newUser = new Players({
-        name: req.body.UserName,
-        wins: 0,
-        losses: 0,
-        totalGuess: 0
+        res.send(users);
     });
 
-    await newUser.save();
-    res.send("New User added!");
-})
+    app.get('/gamesAllInfo', async (req, res) => {
 
-app.get('/games',async (req, res) => {
-    try {
-        const games = await Games.find().populate(['players']);
-        
-        res.json(games);
-      } catch (error) {
-        console.error('error getting games:', error);
-        res.status(500).json({ error: 'Error' });
-      }
+        let games = await Games.find();
+
+        res.send(games);
+
+
+    });
+
+    app.post('/newUsers', async (req, res) => {
+        console.log('Received request body:', req.body);
+
+        const newUser = new Players({
+            name: req.body.UserName,
+            wins: 0,
+            losses: 0,
+            totalGuess: 0
+        });
+
+        await newUser.save();
+        res.send("New User added!");
+    });
+
+    app.post('/newGames', async (req, res) => {
+
+        console.log("Received Game Players: ", req.body);
+
+        let p1 = await Players.findOne({name: req.body.name1});
+        let p2 = await Players.findOne({name: req.body.name2});
+
+        console.log(p1);
+        console.log(p2);
+
+        const newGame = new Games({
+
+            date: new Date(),
+            players: [p1,p2]
+        })
+
+        await newGame.save();
+        res.send("New Game Added!");
+
+    });
+
+    app.get('/games', async (req, res) => {
+        try {
+            const games = await Games.find().populate(['players']);
+
+            res.json(games);
+        } catch (error) {
+            console.error('error getting games:', error);
+            res.status(500).json({ error: 'Error' });
+        }
     });
 
 
