@@ -6,8 +6,6 @@ import {socket} from "../App";
 import GameEndModal from './GameEndModal';
 import { useGame } from './GameContext';
 
-export default function GameRoom({user}){
-
 
 export default function GameRoom({user}){
 
@@ -203,4 +201,5 @@ export default function GameRoom({user}){
       </div>
     </>
   );
-}
+
+                  }
