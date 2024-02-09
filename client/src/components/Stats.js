@@ -281,7 +281,7 @@ export default function Stats(props) {
                     sorted = [...gameList].sort((a, b) => {
                         if (!a.loser || !b.loser) return 1; 
                         
-                        return userList.find(user => user._id === a.loser).name.localeCompare(userList.find(user => user._id === b.loser).name);
+                        return userList.find(user => user._id === b.loser).name.localeCompare(userList.find(user => user._id === a.loser).name);
                     });
                     setAllTimeLoser('reverse');
                     break;
