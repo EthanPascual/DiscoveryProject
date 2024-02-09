@@ -636,6 +636,10 @@ export default function Stats(props) {
                     </tbody>
                 </table>
             </div>
+            <p className="lastHourHeader" style={{textDecoration: 'underline'}}> Sorting Key</p>
+            <p className="lastHourHeader"> Alphabetical: &gt;  </p>
+            <p className="lastHourHeader"> Reverse Alphabetical: &lt; </p>
+            <p className="lastHourHeader"> Default: =</p>
 
         </>
     )
