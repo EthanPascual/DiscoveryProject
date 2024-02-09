@@ -111,7 +111,7 @@ export default function GameRoom({ user, words }) {
     if (words.indexOf(guess) !== -1) {
       
       console.log('guessing: ' + guess);
-      socket.emit('guess', guess);
+      socket.emit('guess', guess, user);
       setGuess('');
       setValidWord(false);
     }
@@ -163,7 +163,7 @@ export default function GameRoom({ user, words }) {
 
   socket.on('message', (message) => {
     setChatlog([...chatLog, 'player 2: ' + message]);
-    console.log('📩: message received: ' + message);
+    console.log('message received: ' + message);
   });
 
 
