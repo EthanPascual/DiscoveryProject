@@ -1,25 +1,27 @@
 Setup:
 You need to install everything into the correct directories.
-In client directory, npm install axios
+In client directory, 
+                     npm install 
                      npm install react
                      npm install react-dom
                      npm install react-router-dom
+                     npm install axios
 
-In server directory, npm install cors
+In server directory, 
+                     npm install 
                      npm install exress
                      npm install nodemon
                      npm install mongoose
+                     npm install cors
 
-in MongoCompass, delete any databases from 316 (cuz we used the same database id number)
-create a new one and name it discovery
+
 run command: mongod   in default directory for this project
 this should connect you to that database
+Clear MongoDB of any Discovery Folder
 
 To run,
 in server directory, run command: nodemon server.js
 then, in client directory, run command: npm start
-
-We using the git workflow from 316:
 
 To update your branch to the most recent changes do the following:
 (Do this before starting to work on your branch)
