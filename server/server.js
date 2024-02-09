@@ -40,7 +40,7 @@ let waitingPlayer = null;
 let player2 = null;
 
 io.on('connection', (socket) => {
-    console.log('🔥: user ' + socket.id + ' connected');
+    console.log('user ' + socket.id + ' connected');
 
     socket.on('findGame', (userParam) => {
         console.log(userParam); // user object
@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
             axios.post("http://localhost:8000/newGames", {
                 name1: userParam,
                 name2: player2
-            })
+            });
             waitingPlayer = null;
             console.log('starts: ' + starts);
             io.to(roomID).emit('gameStart', starts);
@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
 
 
     socket.on('disconnect', () => {
-        console.log('🔥: user ' + socket.id + ' disconnected');
+        console.log('user ' + socket.id + ' disconnected');
         let roomToDelete = null;
 
         gameRooms.forEach((game, roomID) => {
@@ -92,7 +92,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('message', (message) => {
-        console.log('📩: message received: ' + message);
+        console.log('message: ' + message);
 
         for (let [roomID, players] of gameRooms) {
             if (players.players.includes(socket)) {
@@ -102,11 +102,13 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('guess', (guess) => {
+      socket.on('guess', (guess, userParam) => {
         for (let [roomID, game] of gameRooms.entries()) {
             if (game.players.includes(socket) && game.turn === socket.id) {
                 game.turn = game.players.find(player => player.id !== socket.id).id;
-
+                axios.put(`http://localhost:8000/updateGuess`, {
+                    userName: userParam
+                });
                 console.log(game.turn, "turn");
                 io.to(roomID).emit('turn', game.turn);
                 socket.to(roomID).emit('opponentGuess', guess);
@@ -114,25 +116,13 @@ io.on('connection', (socket) => {
             }
         }
     });
+
 
     socket.on('count', (data) => {
         console.log(`Count received: ${data}`);
         for (let [key, game] of gameRooms.entries()) {
             if (game.players.includes(socket)) {
                 socket.to(key).emit('count', data);
-                break;
-            }
-        }
-    });
-
-    socket.on('guess', (guess) => {
-        for (let [roomID, game] of gameRooms.entries()) {
-            if (game.players.includes(socket) && game.turn === socket.id) {
-                game.turn = game.players.find(player => player.id !== socket.id).id;
-
-                console.log(game.turn, "turn");
-                io.to(roomID).emit('turn', game.turn);
-                socket.to(roomID).emit('opponentGuess', guess);
                 break;
             }
         }
@@ -266,4 +256,16 @@ app.post('/newUsers', async (req, res) => {
        
     });
 
+    app.put('/updateGuess', async (req, res) => {
+
+        console.log('Received requested user to update body:', req.body);
+
+        let player = await Players.findOne({name: req.body.userName});
+
+        player.totalGuess += 1;
+
+        await player.save();
+
+        res.send("Guess Updated!");
+    });
 
